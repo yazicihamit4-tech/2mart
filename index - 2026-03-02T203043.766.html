@@ -6755,68 +6755,70 @@ if (game.isPvc && game.active) {
     }
 
     function openVault() {
-        const btn = document.getElementById('btnOpenVault');
-        const container = document.getElementById('vaultContainer');
-        const light = document.getElementById('vaultLight');
+        AdManager.showRewardedAd(() => {
+            const btn = document.getElementById('btnOpenVault');
+            const container = document.getElementById('vaultContainer');
+            const light = document.getElementById('vaultLight');
 
-        // Çift tıklamayı önle
-        btn.disabled = true;
-        btn.innerHTML = "⚙️ Şifre Çözülüyor...";
+            // Çift tıklamayı önle
+            btn.disabled = true;
+            btn.innerHTML = "⚙️ Şifre Çözülüyor...";
 
-        // 1. Ses ve Kol Dönme Efekti
-        AudioEngine.click();
+            // 1. Ses ve Kol Dönme Efekti
+            AudioEngine.click();
 
-        // CSS class ekleyerek animasyonu başlat (Kol döner)
-        container.classList.add('vault-open'); // Bu sınıf CSS'te handle'ı döndürüyor
+            // CSS class ekleyerek animasyonu başlat (Kol döner)
+            container.classList.add('vault-open'); // Bu sınıf CSS'te handle'ı döndürüyor
 
-        // 2. Kapı Açılma Gecikmesi (0.8sn sonra kapı açılır)
-        setTimeout(() => {
-            AudioEngine.success(); // Kasa açılma sesi
-            light.style.background = "#2ecc71"; // Yeşil Işık
-            light.style.boxShadow = "0 0 15px #2ecc71";
+            // 2. Kapı Açılma Gecikmesi (0.8sn sonra kapı açılır)
+            setTimeout(() => {
+                AudioEngine.success(); // Kasa açılma sesi
+                light.style.background = "#2ecc71"; // Yeşil Işık
+                light.style.boxShadow = "0 0 15px #2ecc71";
 
-            // 3. Ödülü Hesapla (Max 500 Altın Mantığı)
-            // %60 Şans: 50 - 150
-            // %30 Şans: 150 - 300
-            // %10 Şans: 300 - 500
-            const rand = Math.random() * 100;
-            let reward = 0;
+                // 3. Ödülü Hesapla (Max 500 Altın Mantığı)
+                // %60 Şans: 50 - 150
+                // %30 Şans: 150 - 300
+                // %10 Şans: 300 - 500
+                const rand = Math.random() * 100;
+                let reward = 0;
 
-            if (rand > 90) {
-                // Efsane Ödül (300-500)
-                reward = Math.floor(Math.random() * (500 - 300 + 1)) + 300;
-            } else if (rand > 60) {
-                // Büyük Ödül (150-300)
-                reward = Math.floor(Math.random() * (300 - 150 + 1)) + 150;
-            } else {
-                // Standart Ödül (50-150)
-                reward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
-            }
+                if (rand > 90) {
+                    // Efsane Ödül (300-500)
+                    reward = Math.floor(Math.random() * (500 - 300 + 1)) + 300;
+                } else if (rand > 60) {
+                    // Büyük Ödül (150-300)
+                    reward = Math.floor(Math.random() * (300 - 150 + 1)) + 150;
+                } else {
+                    // Standart Ödül (50-150)
+                    reward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+                }
 
-            // Ödülü Ekrana Yaz
-            const rewardText = document.getElementById('vaultRewardDisplay');
-            rewardText.innerText = reward;
+                // Ödülü Ekrana Yaz
+                const rewardText = document.getElementById('vaultRewardDisplay');
+                rewardText.innerText = reward;
 
-            // Kullanıcıya Ver
-            updateGold(reward);
+                // Kullanıcıya Ver
+                updateGold(reward);
 
-            // Tarihi Kaydet
-            const now = Date.now();
-            user.lastVaultTime = now;
-            db.ref('users/' + user.name).update({ lastVaultTime: now });
+                // Tarihi Kaydet
+                const now = Date.now();
+                user.lastVaultTime = now;
+                db.ref('users/' + user.name).update({ lastVaultTime: now });
 
-            // Efektler
-            safeConfetti();
-            showToast(`🎉 Kasa Açıldı: ${reward} Altın!`);
+                // Efektler
+                safeConfetti();
+                showToast(`🎉 Kasa Açıldı: ${reward} Altın!`);
 
-            // Butonu Gizle
-            btn.style.display = 'none';
+                // Butonu Gizle
+                btn.style.display = 'none';
 
-            // Bilgi Mesajı
-            document.getElementById('vaultTimerText').style.display = 'block';
-            document.getElementById('vaultTimeLeft').innerText = "24 saat";
+                // Bilgi Mesajı
+                document.getElementById('vaultTimerText').style.display = 'block';
+                document.getElementById('vaultTimeLeft').innerText = "24 saat";
 
-        }, 800); // 0.8 saniye bekle (Kol dönme süresi)
+            }, 800); // 0.8 saniye bekle (Kol dönme süresi)
+        });
     }
     function toggleGameChat() {
         const c = document.getElementById('gameChatContainer');
@@ -8943,20 +8945,22 @@ function startSingle() {
         // 3. Ödülü Ver
         if (!confirm(`Tebrikler! ${config.reward} Altın ödülünü almak istiyor musun?`)) return;
 
-        claimedRewards[lvl] = true;
-        user.claimedCareerRewards = claimedRewards;
+        AdManager.showRewardedAd(() => {
+            claimedRewards[lvl] = true;
+            user.claimedCareerRewards = claimedRewards;
 
-        // Veritabanını Güncelle
-        db.ref('users/' + user.name).update({
-            claimedCareerRewards: claimedRewards
-        }).then(() => {
-            updateGold(config.reward);
-            showToast(`🎁 ${config.reward} Altın Hesabına Eklendi!`);
-            AudioEngine.win();
-            safeConfetti();
+            // Veritabanını Güncelle
+            db.ref('users/' + user.name).update({
+                claimedCareerRewards: claimedRewards
+            }).then(() => {
+                updateGold(config.reward);
+                showToast(`🎁 ${config.reward} Altın Hesabına Eklendi!`);
+                AudioEngine.win();
+                safeConfetti();
 
-            // Haritayı Yenile
-            openCareerMap();
+                // Haritayı Yenile
+                openCareerMap();
+            });
         });
     }
 
@@ -10070,17 +10074,19 @@ function restartWordGame() {
 
         if (!confirm(`Tebrikler! ${config.reward} Altın ödülünü almak istiyor musun?`)) return;
 
-        if (!user.claimedWordRewards) user.claimedWordRewards = {};
-        user.claimedWordRewards[lvl] = true;
+        AdManager.showRewardedAd(() => {
+            if (!user.claimedWordRewards) user.claimedWordRewards = {};
+            user.claimedWordRewards[lvl] = true;
 
-        db.ref('users/' + user.name).update({
-            claimedWordRewards: user.claimedWordRewards
-        }).then(() => {
-            updateGold(config.reward);
-            showToast(`🎁 ${config.reward} Altın Hesabına Eklendi!`);
-            AudioEngine.win();
-            safeConfetti();
-            openWordCareer(); // Refresh
+            db.ref('users/' + user.name).update({
+                claimedWordRewards: user.claimedWordRewards
+            }).then(() => {
+                updateGold(config.reward);
+                showToast(`🎁 ${config.reward} Altın Hesabına Eklendi!`);
+                AudioEngine.win();
+                safeConfetti();
+                openWordCareer(); // Refresh
+            });
         });
     }
 
