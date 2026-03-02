@@ -4869,19 +4869,39 @@ const THEMES = [
 
         isAndroid: function () { return (typeof window.Android !== "undefined" && window.Android !== null); },
 
+        // Ad Request UI Blocker
+        showAdLoading: function() {
+            if (!document.getElementById('adBlocker')) {
+                const blocker = document.createElement('div');
+                blocker.id = 'adBlocker';
+                blocker.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;font-size:1.2rem;';
+                blocker.innerText = '⏳ Reklam Yükleniyor...';
+                document.body.appendChild(blocker);
+            }
+        },
+        hideAdLoading: function() {
+            const blocker = document.getElementById('adBlocker');
+            if (blocker) blocker.remove();
+        },
+
         // Geçiş Reklamı (Interstitial) - Örn: Oyun sonlarında
         showInterstitialAd: function () {
+            this.showAdLoading();
             if (this.isAndroid()) {
                 // Yeni MainActivity'deki birleştirilmiş akışı çağırır
                 window.Android.showInterstitial(null);
             } else {
                 console.log("Web Mode: Interstitial Simulation");
+                this.hideAdLoading();
                 if(window.resumeGame) window.resumeGame();
             }
+            // Timeout in case ad fails silently
+            setTimeout(() => this.hideAdLoading(), 6500);
         },
 
         // Ödüllü Reklam (Rewarded) - Örn: İpucu veya Market için
         showRewardedAd: function (onSuccess) {
+            this.showAdLoading();
             // Kotlin tarafı ödül verildiğinde window.onReward() fonksiyonunu tetikler
             window.onReward = () => {
                 onSuccess();
@@ -4892,9 +4912,12 @@ const THEMES = [
                 window.Android.showRewardedAd(null);
             } else {
                 console.log("Web Mode: Rewarded Simulation");
+                this.hideAdLoading();
                 if(window.onReward) window.onReward();
                 if(window.resumeGame) window.resumeGame();
             }
+            // Timeout in case ad fails silently
+            setTimeout(() => this.hideAdLoading(), 8500);
         },
 
         // Callback for Android to trigger reward (Mevcut olan korunuyor)
@@ -6755,13 +6778,17 @@ if (game.isPvc && game.active) {
     }
 
     function openVault() {
+        const btn = document.getElementById('btnOpenVault');
+        if (btn.disabled) return;
+
+        // Çift tıklamayı hemen önle
+        btn.disabled = true;
+        btn.innerHTML = "⏳ Reklam Yükleniyor...";
+
         AdManager.showRewardedAd(() => {
-            const btn = document.getElementById('btnOpenVault');
             const container = document.getElementById('vaultContainer');
             const light = document.getElementById('vaultLight');
 
-            // Çift tıklamayı önle
-            btn.disabled = true;
             btn.innerHTML = "⚙️ Şifre Çözülüyor...";
 
             // 1. Ses ve Kol Dönme Efekti
@@ -10137,17 +10164,7 @@ function restartWordGame() {
     // Global Ad Counter for Word Game
     let wordGameAdCounter = 0;
     function handleWordGameAd() {
-        wordGameAdCounter++;
-        if (wordGameAdCounter % 4 === 0) {
-            setTimeout(() => {
-                AdManager.showInterstitialAd();
-            }, 500); // Small delay before start? Or after end?
-            // User said "4 oyunda bir geçiş reklamı olsun". Usually at end or start.
-            // Start is annoying. Let's trigger it at end?
-            // Or just trigger logic here but show at end?
-            // Better: Trigger at END of game.
-            // I'll move logic to game end.
-        }
+        // Disabled here, handled strictly in checkWordGameAd at game end
     }
 
     function handleWordGameWin() {
@@ -10189,8 +10206,8 @@ function restartWordGame() {
 
     function checkWordGameAd() {
         wordGameAdCounter++;
-        // 4 oyunda bir
-        if (wordGameAdCounter % 4 === 0) {
+        // 3 oyunda bir (exactly every 3 games)
+        if (wordGameAdCounter % 3 === 0) {
             AdManager.showInterstitialAd();
         }
     }
@@ -11043,9 +11060,12 @@ function restartWordGame() {
     window.onAdClosed = function() {
         console.log("Ad Closed - Resuming Game UI");
 
-        // Trigger Reward Callback if pending
-        if (typeof AdManager !== "undefined" && AdManager.pendingCallback) {
-            AdManager.onReward();
+        if (typeof AdManager !== "undefined") {
+            AdManager.hideAdLoading();
+            // Trigger Reward Callback if pending
+            if (AdManager.pendingCallback) {
+                AdManager.onReward();
+            }
         }
 
         if(window.resumeGame) window.resumeGame();
@@ -11054,6 +11074,8 @@ function restartWordGame() {
     // Oyunun donmasını engelleyen kritik fonksiyon
     window.resumeGame = function() {
         console.log("Resume Game Signal Received");
+        if (typeof AdManager !== "undefined") AdManager.hideAdLoading();
+
         // Burada eğer oyunu durdurduysan (pause), devam ettirme kodlarını ekleyebilirsin.
         // Örn: game.paused = false;
 
