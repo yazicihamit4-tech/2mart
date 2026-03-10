@@ -104,6 +104,10 @@ class MainActivity : AppCompatActivity() {
             javaScriptEnabled = true
             domStorageEnabled = true
             mediaPlaybackRequiresUserGesture = false
+            allowFileAccess = true
+            allowContentAccess = true
+            allowFileAccessFromFileURLs = true
+            allowUniversalAccessFromFileURLs = true
         }
         myWebView.addJavascriptInterface(WebAppInterface(this), "Android")
         myWebView.webViewClient = WebViewClient()

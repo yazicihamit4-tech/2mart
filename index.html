@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>TahminSon v25.5 (PERFORMANCE FIX)</title>
+    <meta name="color-scheme" content="light only">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!-- ANDROID PORTRAIT LOCK -->
+    <meta name="screen-orientation" content="portrait">
+    <link rel="manifest"
+        href='data:application/manifest+json,{"display":"standalone","orientation":"portrait","theme_color":"#f0f2f5","background_color":"#f0f2f5","name":"TahminSon","short_name":"TahminSon"}'>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+    // --- TÜM MESAJLARI GÖRME FONKSİYONLARI ---
+    // --- GELİŞMİŞ YÖNETİM MESAJ SİSTEMİ (REAL-TIME) ---
+    var db;
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js">
+</script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js">
+</script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js">
+</script>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <div id="landscape-warning">
+        <div style="font-size: 3rem;">📱</div>
+        <h2>Lütfen Telefonu Çevirin</h2>
+        <p>Bu oyun sadece dik (portrait) modda oynanabilir.</p>
+    </div>
+    <div class="floating-numbers-container" id="bgAnim"></div>
+    <div id="emojiLayer"></div>
+    <div id="sabotageLayer" class="ink-blot"></div>
+
+    <div id="loading"
+        style="position:fixed;top:0;left:0;width:100%;height:100%;background:white;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#333;text-shadow:none;">
+        <h2 style="color:#6c5ce7;font-size:2rem;">TahminSon</h2>
+        <p style="color:#999;">v25.6 (ULTIMATE)</p>
+        <div id="errorLog" style="color:red;font-size:0.7rem;margin-top:10px;"></div>
+    </div>
+
+    <div id="screen-login" class="screen" style="justify-content:center;padding:20px; z-index:5;">
+        <div class="card">
+            <h1 style="color:var(--primary);">TahminSon</h1>
+            <div style="font-size:0.8rem; margin-bottom:10px;">🟢 <span id="fakeOnlineCount">...</span> Kişi Online
+            </div>
+            <div class="avatar-wrapper" id="avatarList">
+                <div class="avatar-item selected"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Smiling%20Face%20with%20Sunglasses.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Man%20Technologist.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Woman%20Technologist.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Ninja.png">
+                </div>
+
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Lion.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Wolf.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Panda.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Animals/Cat%20Face.png">
+                </div>
+
+
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Robot.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Alien%20Monster.png">
+                </div>
+                <div class="avatar-item"><img
+                        src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Clown%20Face.png">
+                </div>
+            </div>
+            <input type="text" id="usernameInput" placeholder="Kullanıcı Adı" maxlength="12">
+            <input type="password" id="passwordInput" placeholder="Şifre" maxlength="12">
+            <button id="btnLogin" class="btn-blue" style="margin-top:20px;">OYUNA GİR</button>
+            <p style="font-size:0.8rem;color:#eee;">İlk girişte şifreniz oluşturulur.</p>
+        </div>
+    </div>
+
+    <div id="screen-lobby" class="screen">
+
+        <!-- Banner Ad Container -->
+        <div id="bannerAdContainer"
+            style="width:100%; min-height:60px; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.02); margin-bottom:20px; border-top: 1px solid #eee; padding-top: 10px;">
+        </div>
+
+        <div id="marqueeArea">
+            <marquee id="dynamicMarquee" scrollamount="6" style="width:100%;"></marquee>
+        </div>
+
+        <div class="top-bar">
+            <div class="top-bar-row-main"
+                style="display:flex; align-items:center; width:100%; padding:8px 15px; position:relative; overflow:hidden;">
+
+                <div class="user-info" onclick="openUserProfile(user.name)"
+                    style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+                    <div id="lobbyAvatarDisplay"
+                        style="width:45px; height:45px; font-size:1.8rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        😎</div>
+                    <div style="line-height:1.1;">
+                        <div id="lobbyName" style="font-weight:bold; font-size:0.95rem; color:#2d3436;">Kullanıcı</div>
+                        <div style="font-size:0.65rem; color:#888; font-weight:600;">
+                            Lv. <span id="userLevelDisplay">1</span> <span id="lobbyClanTag"
+                                style="color:#e17055;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; align-items:center; margin-left: auto;">
+                    <div id="lobbyPetWalker"
+                        style="margin-right: 10px; position: relative; height: 60px; width: 60px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <div id="petVisualContainer"
+                            style="width:48px; height:48px; overflow:visible; position:relative; display:flex; align-items:center; justify-content:center;">
+                            <!-- Pet Image: Initial class 'anim-idle-breath' -->
+                            <img id="petMainImage" src="assets/pet_cat_3d.png" class="anim-idle-breath"
+                                style="width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.3)); will-change: transform;">
+                        </div>
+                        <style>
+                            /* Idle Breath (Default) */
+                            @keyframes pet-idle-breath {
+                                0% {
+                                    transform: scale(1);
+                                }
+
+                                50% {
+                                    transform: scale(1.05);
+                                }
+
+                                100% {
+                                    transform: scale(1);
+                                }
+                            }
+
+                            /* Happy Bounce */
+                            @keyframes pet-anim-bounce {
+
+                                0%,
+                                100% {
+                                    transform: translateY(0) scale(1, 1);
+                                }
+
+                                30% {
+                                    transform: translateY(-15px) scale(0.9, 1.1);
+                                }
+
+                                50% {
+                                    transform: translateY(0) scale(1.1, 0.9);
+                                }
+
+                                70% {
+                                    transform: translateY(-8px) scale(0.95, 1.05);
+                                }
+                            }
+
+                            /* Curious Wobble */
+                            @keyframes pet-anim-wobble {
+                                0% {
+                                    transform: rotate(0deg);
+                                }
+
+                                25% {
+                                    transform: rotate(-5deg);
+                                }
+
+                                75% {
+                                    transform: rotate(5deg);
+                                }
+
+                                100% {
+                                    transform: rotate(0deg);
+                                }
+                            }
+
+                            /* Alert Shake */
+                            @keyframes pet-anim-shake {
+                                0% {
+                                    transform: translateX(0);
+                                }
+
+                                25% {
+                                    transform: translateX(-3px);
+                                }
+
+                                75% {
+                                    transform: translateX(3px);
+                                }
+
+                                100% {
+                                    transform: translateX(0);
+                                }
+                            }
+
+                            .anim-idle-breath {
+                                animation: pet-idle-breath 3s ease-in-out infinite;
+                            }
+
+                            .anim-bounce {
+                                animation: pet-anim-bounce 0.8s ease-out;
+                            }
+
+                            .anim-wobble {
+                                animation: pet-anim-wobble 1s ease-in-out;
+                            }
+
+                            .anim-shake {
+                                animation: pet-anim-shake 0.5s ease-in-out;
+                            }
+                        </style>
+                        <div id="petEnergyBadge"
+                                style="font-size: 0.6rem; background: #2ecc71; color: white; padding: 1px 4px; border-radius: 4px; margin-top: -5px; z-index: 2;">
+                                100%</div>
+                    </div>
+                    <!-- LOBBY FEED BUTTON -->
+                    <button id="btnLobbyFeed" class="btn-green" onclick="PetSystem.feedPet()"
+                        style="display:none; width:auto; padding:2px 8px; margin:0 5px 0 0; font-size:0.7rem; border-radius:8px; animation: pulse-active 1s infinite;">
+                        🍖 BESLE
+                    </button>
+                    <div id="btnMute" class="currency-pill" onclick="toggleMute()"
+                        style="background:#fff; color:#333; margin-right:5px; cursor:pointer; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:1rem; border:1px solid #ddd; display:flex; align-items:center; justify-content:center;">
+                        🔊
+                    </div>
+                    <div id="btnNewMsg" class="currency-pill" onclick="openLastMessage()"
+                        style="display:none; background:#ff4757; color:#fff; margin-right:8px; cursor:pointer; animation: pulse-active 1s infinite; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:0.7rem;">
+                        <span>📩</span>
+                    </div>
+                    <div class="currency-pill"
+                        style="background:#f1c40f; color:#000; padding:4px 10px; border-radius:15px; font-weight:bold; display:flex; align-items:center; gap:4px; font-size:0.9rem; border:1px solid rgba(0,0,0,0.05);">
+                        <span>💰</span> <span id="lobbyGold">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-bar-row-stats">
+                <div id="dailyWinnerDisplay" class="mini-stat-pill pill-winner">
+                    <div class="mini-stat-left">
+                        <span style="font-size:1rem;">🏆</span>
+                        <span class="mini-stat-title">ŞAMPİYON</span>
+                    </div>
+                    <div class="mini-stat-val">
+                        <span id="dwScore" class="stat-score-line" style="color:#fff; font-size:0.9rem;">0 💰</span>
+                        <span id="dwUser" class="stat-user-line" style="font-size:0.75rem;">Yok</span>
+                    </div>
+                </div>
+
+                <div id="speedrunBox" class="mini-stat-pill pill-speed">
+                    <div class="mini-stat-left">
+                        <span style="font-size:1rem;">⚡</span>
+                        <span id="srTitle" class="mini-stat-title">REKOR</span>
+                    </div>
+                    <div class="mini-stat-val">
+                        <span id="srTime" class="stat-score-line" style="color:#fff; font-size:0.9rem;"></span>
+                        <span id="srUser" class="stat-user-line" style="font-size:0.75rem;">Yok</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-xp-container">
+                <div id="xpBarFill" class="header-xp-fill"></div>
+            </div>
+            <span id="xpText" style="display:none;"></span>
+        </div>
+
+        <div class="hero-section">
+
+            <div class="play-container" style="margin-bottom: 20px;">
+                <div class="play-ring"></div>
+                <div class="play-btn-huge" onclick="openGameSelector()">
+                    <div class="play-content">
+                        <div class="play-icon">▶</div>
+                        <div class="play-text">OYNA</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dailyQuestBox" class="quest-box" style="width:100%; max-width:350px; margin-bottom: 15px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div><b style="color:#d35400;">🔥 GÜNLÜK SERİ:</b> <span id="questText">Üst üste 3 oyun
+                            kazan!</span>
+                    </div>
+                    <button id="btnClaimQuest" class="btn-gold"
+                        style="width:auto;padding:5px 10px;margin:0;display:none;" onclick="claimQuestReward()">1000 💰
+                        AL</button>
+                </div>
+                <div style="margin-top:5px;font-size:0.75rem;color:#666;display:flex;justify-content:space-between;">
+                    <span>Durum: <b id="questProgress">0/3</b></span>
+                </div>
+                <div class="quest-bar-bg">
+                    <div id="questBarFill" class="quest-bar-fill"></div>
+                </div>
+            </div>
+
+
+        <div style="display:flex; gap:10px; width:100%; max-width:350px; margin-bottom:20px;">
+            <button class="btn-green"
+                style="flex:1;  background:linear-gradient(135deg, #00b894, #00cec9); border:2px solid #fff; height:60px; font-size:1.1rem; margin-bottom:20px; box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4); position:relative;"
+                onclick="openCareerMap()">
+
+                🗺️ KARİYER (SAYI)
+
+                <span onclick="event.stopPropagation(); showModal('modal-career-info');" style="position:absolute; right:12px; top:50%; transform:translateY(-50%);
+                 width:22px; height:22px; border-radius:50%;
+                 background:#0984e3; color:white; font-size:14px;
+                 display:flex; align-items:center; justify-content:center;
+                 font-weight:bold; cursor:pointer;">
+                    ?
+                </span>
+            </button>
+
+            <button class="btn-purple" style="flex:1; background:linear-gradient(135deg, #8e44ad, #9b59b6); border:2px solid #fff; height:60px; font-size:0.9rem; box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4); position:relative;" onclick="openWordCareer()">
+                📚 KARİYER (KELİME)
+                <span onclick="event.stopPropagation(); showModal('modal-word-info');" style="position:absolute; right:5px; top:5px; width:18px; height:18px; border-radius:50%; background:#fff; color:#8e44ad; font-size:12px; display:flex; align-items:center; justify-content:center; font-weight:bold;">?</span>
+            </button>
+
+        </div>
+
+            <div style="position:relative; width:100%; max-width:350px; margin-top:10px;">
+                <button id="btnBountyLobby" class="btn-gold" style="width:100%; background:linear-gradient(135deg, #f39c12, #d35400); border:1px solid #fff; color:white; text-shadow:0 1px 2px rgba(0,0,0,0.3);" onclick="openBountyScreen()">
+                    🤠 ÖDÜL AVCILARI
+                </button>
+                <div onclick="event.stopPropagation(); showModal('modal-bounty-info');" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); width:22px; height:22px; border-radius:50%; background:#0984e3; color:white; font-size:14px; display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; z-index:5;">
+                    ?
+                </div>
+            </div>
+
+
+
+
+            <div id="goldRainBadge" class="gold-rain-active" style="width:100%; max-width:350px;">🌧️ ALTIN YAĞMURU
+                AKTİF!
+                (x2 KAZANÇ) 💰</div>
+
+
+
+            <div class="card"
+                style="width:100%; max-width:350px; box-sizing:border-box; padding:10px; margin-top:10px;">
+                <h4 style="margin:0 0 10px 0; color:#eee;">🟢 Aktif Oyuncular</h4>
+                <div id="activePlayersList" class="list-container" style="height:100px;"></div>
+            </div>
+
+
+
+            <button id="btnAdminPanel" class="btn-dark"
+                style="display:none; width:auto; padding:5px 10px; font-size:0.7rem; margin-top:10px;"
+                onclick="changeScreen('screen-admin')">👑 Yönetim</button>
+
+            <!-- Native Ad Container -->
+            <div id="nativeAdContainer" style="width:100%; min-height:100px; margin-top:10px; background:rgba(0,0,0,0.05); border-radius:10px; display:flex; justify-content:center; align-items:center;"></div>
+        </div>
+        <div class="bottom-nav" style="padding: 0 5px;">
+            <div class="nav-item active" onclick="showSection('home')">
+                <div class="nav-icon">🏠</div>
+                <div style="font-size:0.7rem;">Ana Sayfa</div>
+            </div>
+            <div class="nav-item" onclick="openMarket()">
+                <div class="nav-icon">🛒</div>
+                <div style="font-size:0.7rem;">Market</div>
+            </div>
+            <div class="nav-item" onclick="openInboxModal()">
+                <div class="nav-icon" style="position:relative;">💬<div id="msgBadge"
+                        style="display:none; position:absolute; top:-2px; right:-5px; width:10px; height:10px; background:red; border-radius:50%; border:2px solid #fff;">
+                    </div>
+                </div>
+                <div style="font-size:0.7rem;">Mesajlar</div>
+            </div>
+            <div class="nav-item" onclick="openInventory()">
+                <div class="nav-icon">🎒</div>
+                <div style="font-size:0.7rem;">Çanta</div>
+            </div>
+            <div class="nav-item" onclick="showLeaderboard()">
+                <div class="nav-icon">🏆</div>
+                <div style="font-size:0.7rem;">Sıralama</div>
+            </div>
+            <div class="nav-item" onclick="showModal('modal-more')">
+                <div class="nav-icon">🍔</div>
+                <div style="font-size:0.7rem;">Diğer</div>
+            </div>
+        </div>
+
+        <div id="toast"></div>
+    </div>
+    <div id="screen-bounty" class="screen">
+        <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+            <div style="flex-shrink: 0;">
+                <button class="nav-btn" onclick="changeScreen('screen-lobby')">⬅</button>
+                <h2 style="color:#d35400; text-align: center; margin-top: 5px;">🤠 ÖDÜL AVCILARI</h2>
+
+                <div style="display:flex; gap:10px; margin-bottom:15px; background: rgba(0,0,0,0.05); padding: 5px; border-radius: 12px;">
+                    <button id="tabBountyList" class="btn-blue" onclick="switchBountyTab('list')" style="font-size:0.85rem; flex: 1;">🎯 AKTİF İLANLAR</button>
+                    <button id="tabBountyCreate" class="btn-grey" onclick="switchBountyTab('create')" style="font-size:0.85rem; flex: 1;">📝 İLAN OLUŞTUR</button>
+                    <button class="btn-gold" onclick="showModal('modal-bounty-info')" style="width:auto; padding:5px 12px; font-size: 1.2rem;">❓</button>
+                </div>
+            </div>
+
+            <div id="bountyListArea" style="flex: 1; overflow-y: auto; padding-bottom: 20px;">
+                <p style="font-size:0.8rem; color:#666; text-align: center; margin-bottom:10px;">
+                    Bir ilanı seç ve ödülü kazan!<br>
+                    <small>Kazanamazsan giriş ücreti ilan sahibine gider.</small>
+                </p>
+                <div id="bountyListContainer" class="list-container" style="max-height:none; overflow: visible;">Yükleniyor...</div>
+            </div>
+
+            <div id="bountyCreateArea" style="display:none; text-align:left; flex: 1; overflow-y: auto;">
+                <div style="background:rgba(255,255,255,0.8); padding:15px; border-radius:15px; border: 1px solid #ddd; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                    <h4 style="margin: 0 0 10px 0; color: var(--primary);">Yeni Av Başlat</h4>
+
+                    <label style="font-size:0.8rem; font-weight:bold; color:#555;">1. Zorluk Seç:</label>
+                    <select id="bountyDiffSelect" style="width:100%; margin:5px 0 15px 0; padding:12px; border-radius:10px; border:2px solid #eee; font-weight:bold;" onchange="updateBountyInputRules(this.value)">
+                        <option value="4">4 Hane (Normal)</option>
+                        <option value="5">5 Hane (Zor)</option>
+                        <option value="6">6 Hane (Çok Zor)</option>
+                        <option value="7">7 Hane (İmkansız)</option>
+                    </select>
+
+                    <label style="font-size:0.8rem; font-weight:bold; color:#555;">2. Gizli Sayı Belirle:</label>
+                    <input type="tel" id="bountySecretInput" placeholder="Örn: 1234" maxlength="4" style="letter-spacing:5px; font-size: 1.2rem; text-align:center;">
+                    <small style="color:#999; display:block; margin-top:-5px; margin-bottom: 15px;">Rakamları birbirinden farklı olmalı.</small>
+
+                    <label style="font-size:0.8rem; font-weight:bold; color:#555;">3. Ödül Miktarı (Altın):</label>
+                    <div style="display:flex; gap:10px; align-items: center;">
+                        <input type="number" id="bountyRewardInput" placeholder="Min: 100" style="margin:0;">
+                        <span style="font-size:1.5rem;">💰</span>
+                    </div>
+
+                    <div style="margin-top:15px; padding:10px; background:#fff3cd; border-radius:8px; font-size:0.75rem; color:#856404; border: 1px solid #ffeeba;">
+                        💡 <b>Kazanç Sistemi:</b><br>
+                        • İlan verirken ödül hesabından düşer.<br>
+                        • Avcılar başarısız olursa, ödedikleri giriş ücreti (%10) <b>SANA GELİR.</b>
+                    </div>
+                </div>
+                <button class="btn-green" onclick="postBounty()" style="margin-top:15px; padding: 15px; font-size: 1rem;">İLAN YAYINLA</button>
+            </div>
+        </div>
+    </div>
+    <div id="screen-word-game" class="screen">
+        <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+            <div style="flex-shrink: 0; display:flex; align-items:center; justify-content:space-between; margin-bottom:15px;">
+                <button class="nav-btn" style="position:static; margin:0;" onclick="attemptExit()">⬅</button>
+                <div style="text-align:center;">
+                    <h3 style="margin:0; color:#8e44ad;">KELİME HAZİNESİ</h3>
+                    <small id="wordLevelDisplay" style="color:#666;">Seviye 1</small><div id="wordTimerDisplay" style="color:#e74c3c; font-weight:bold; font-size:0.9rem; display:none;">00:00</div>
+                </div>
+                <button id="btnWordChat" class="nav-btn" style="position:static; margin:0; font-size:1rem; background:#3498db; display:none;" onclick="toggleGameChat()">💬</button>
+            </div>
+
+
+            <!-- Helper Items -->
+            <div class="item-bar" style="margin-bottom:10px;">
+                <button class="item-btn" onclick="useItem('oracle')">🔮 Harf Aç<div id="qty-oracle-word" class="item-count">0</div></button>
+                <button class="item-btn" onclick="useItem('freeze')">❄️ Zaman<div id="qty-freeze-word" class="item-count">0</div></button>
+            </div>
+            <!-- Game Board -->
+            <div id="wordGameBoardContainer" style="flex:1; display:flex; justify-content:center; align-items:flex-start; overflow-y:auto; padding-top:20px; padding-bottom:100px;">
+                <div id="wordGameBoard" style="display:grid; gap:5px; margin-bottom:20px;">
+                    <!-- Cells generated by JS -->
+                </div>
+            </div>
+
+            <!-- Word Hint Bar -->
+            <div id="wordHintBar" style="display:flex; justify-content:center; gap:3px; margin-bottom:8px; width:100%;">
+                <!-- Auto generated by JS -->
+            </div>
+
+            <!-- Virtual Keyboard -->
+            <div id="wordKeyboard" style="flex-shrink:0; background:#eee; padding:10px; border-radius:15px;">
+                <div class="kb-row" style="display:flex; justify-content:center; gap:3px; margin-bottom:5px;">
+                    <button class="key-btn" data-key="E" onclick="handleWordKey('E')">E</button>
+                    <button class="key-btn" data-key="R" onclick="handleWordKey('R')">R</button>
+                    <button class="key-btn" data-key="T" onclick="handleWordKey('T')">T</button>
+                    <button class="key-btn" data-key="Y" onclick="handleWordKey('Y')">Y</button>
+                    <button class="key-btn" data-key="U" onclick="handleWordKey('U')">U</button>
+                    <button class="key-btn" data-key="I" onclick="handleWordKey('I')">I</button>
+                    <button class="key-btn" data-key="O" onclick="handleWordKey('O')">O</button>
+                    <button class="key-btn" data-key="P" onclick="handleWordKey('P')">P</button>
+                    <button class="key-btn" data-key="Ğ" onclick="handleWordKey('Ğ')">Ğ</button>
+                    <button class="key-btn" data-key="Ü" onclick="handleWordKey('Ü')">Ü</button>
+                </div>
+                <div class="kb-row" style="display:flex; justify-content:center; gap:3px; margin-bottom:5px;">
+                    <button class="key-btn" data-key="A" onclick="handleWordKey('A')">A</button>
+                    <button class="key-btn" data-key="S" onclick="handleWordKey('S')">S</button>
+                    <button class="key-btn" data-key="D" onclick="handleWordKey('D')">D</button>
+                    <button class="key-btn" data-key="F" onclick="handleWordKey('F')">F</button>
+                    <button class="key-btn" data-key="G" onclick="handleWordKey('G')">G</button>
+                    <button class="key-btn" data-key="H" onclick="handleWordKey('H')">H</button>
+                    <button class="key-btn" data-key="J" onclick="handleWordKey('J')">J</button>
+                    <button class="key-btn" data-key="K" onclick="handleWordKey('K')">K</button>
+                    <button class="key-btn" data-key="L" onclick="handleWordKey('L')">L</button>
+                    <button class="key-btn" data-key="Ş" onclick="handleWordKey('Ş')">Ş</button>
+                    <button class="key-btn" data-key="İ" onclick="handleWordKey('İ')">İ</button>
+                </div>
+                <div class="kb-row" style="display:flex; justify-content:center; gap:3px;">
+                    <button class="key-btn special" onclick="handleWordKey('ENTER')">GİR</button>
+                    <button class="key-btn" data-key="Z" onclick="handleWordKey('Z')">Z</button>
+                    <button class="key-btn" data-key="C" onclick="handleWordKey('C')">C</button>
+                    <button class="key-btn" data-key="V" onclick="handleWordKey('V')">V</button>
+                    <button class="key-btn" data-key="B" onclick="handleWordKey('B')">B</button>
+                    <button class="key-btn" data-key="N" onclick="handleWordKey('N')">N</button>
+                    <button class="key-btn" data-key="M" onclick="handleWordKey('M')">M</button>
+                    <button class="key-btn" data-key="Ö" onclick="handleWordKey('Ö')">Ö</button>
+                    <button class="key-btn" data-key="Ç" onclick="handleWordKey('Ç')">Ç</button>
+                    <button class="key-btn special" onclick="handleWordKey('DEL')">⌫</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Word Info Modal -->
+    <div id="modal-word-info" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🇹🇷 Kelime Hazinesi</h3>
+            <p style="text-align:left; font-size:0.9rem;">Gizli kelimeyi bulmaya çalış!<br><br>
+            🟩 <b>YEŞİL:</b> Harf doğru yerde.<br>
+            🟨 <b>SARI:</b> Harf kelimede var ama yanlış yerde.<br>
+            ⬜ <b>GRİ:</b> Harf kelimede yok.<br><br>
+            Kelimeyi bulursan seviye atlar ve altın kazanırsın. Başarılar!</p>
+            <button class="btn-green" onclick="closeModal('modal-word-info')">ANLADIM</button>
+        </div>
+    </div>
+
+    <!-- Game Selector Modal -->
+    <div id="modal-game-selector" class="modal-overlay">
+        <div class="modal-box" style="max-width: 380px;">
+            <h3 style="margin-bottom: 20px;">🎮 Oyun Seç</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Hangi oyunu oynamak istersin?</p>
+
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="btn-blue" onclick="closeModal('modal-game-selector'); safeOpenSetup();" style="padding:18px; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:10px;">
+                    <span style="font-size:2rem;">🔢</span>
+                    <div style="text-align:left;">
+                        <div style="font-weight:bold;">SAYI TAHMİN</div>
+                        <div style="font-size:0.75rem; opacity:0.9;">Klasik + - oyunu</div>
+                    </div>
+                </button>
+
+                <button class="btn-purple" onclick="closeModal('modal-game-selector'); safeOpenWordSetup();" style="padding:18px; font-size:1.1rem; display:flex; align-items:center; justify-content:center; gap:10px;">
+                    <span style="font-size:2rem;">🇹🇷</span>
+                    <div style="text-align:left;">
+                        <div style="font-weight:bold;">KELİME HAZİNESİ</div>
+                        <div style="font-size:0.75rem; opacity:0.9;">Kelime bulma oyunu</div>
+                    </div>
+                </button>
+            </div>
+
+            <button class="btn-grey" onclick="closeModal('modal-game-selector')" style="margin-top:15px; width:auto; padding:8px 20px;">İptal</button>
+        </div>
+    </div>
+
+
+    <div id="modal-bounty-info" class="modal-overlay">
+        <div class="modal-box" style="text-align:left;">
+            <h3 style="text-align:center; color:#d35400;">🤠 NASIL OYNANIR?</h3>
+            <div style="font-size:0.9rem; color:#333; line-height:1.5;">
+                <p><b>1. AVCI OLMAK (İlan Seç):</b><br>Listeden bir ilan seç. Giriş ücretini öde (Ödülün %10'u). Gizli sayıyı bulursan <b>BÜYÜK ÖDÜLÜ</b> alırsın!</p>
+                <hr>
+                <p><b>2. İLAN VERMEK (Tuzak Kur):</b><br>Zor bir sayı belirle ve ödül koy. Diğer oyuncular senin sayını bulmaya çalışır. Bulamazlarsa ödedikleri giriş ücreti <b>SANA GELİR!</b></p>
+            </div>
+            <button class="btn-red" onclick="closeModal('modal-bounty-info')" style="margin-top:15px;">TAMAM, BAŞLA!</button>
+        </div>
+    </div>
+<div id="modal-invite-incoming" class="modal-overlay">
+        <div class="modal-box">
+            <h3>📢 Davet Var!</h3>
+            <p><b id="inviterNameDisplay">...</b> seni oyuna çağırıyor!</p>
+            <div style="display:flex;gap:10px;justify-content:center;"><button class="btn-green"
+                    onclick="acceptInvite()">KABUL ET</button><button class="btn-red"
+                    onclick="closeModal('modal-invite-incoming')">REDDET</button></div>
+        </div>
+    </div>
+    <div id="modal-disconnect" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color:var(--danger)">⚠️ Bağlantı Koptu</h3>
+            <p>Rakip oyundan düştü!</p>
+            <div style="font-size:3rem;">🏁</div>
+            <p>Hükmen galip sayıldın.</p><button class="btn-green" onclick="leaveRoom()">ANA MENÜYE DÖN</button>
+        </div>
+    </div>
+    <div id="modal-broadcast" class="modal-overlay">
+        <div class="modal-box" style="border: 2px solid var(--gold);">
+            <h3 style="color:var(--gold)">📢 SİSTEM DUYURUSU</h3>
+            <p id="broadcastMsg"
+                style="font-size:1.1rem; padding:10px; background:rgba(255,255,255,0.1); border-radius:10px;">...</p>
+            <button class="btn-blue" onclick="closeModal('modal-broadcast')">TAMAM</button>
+        </div>
+    </div>
+
+    <div id="modal-exit-confirm" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🚪 Çıkış</h3>
+            <p>Oyundan çıkmak istediğine emin misin?</p>
+            <div style="display:flex;gap:10px;justify-content:center;"><button class="btn-red"
+                    onclick="confirmExitGame()">EVET, ÇIK</button><button class="btn-grey"
+                    onclick="closeModal('modal-exit-confirm')">İPTAL</button></div>
+        </div>
+    </div>
+
+    <!-- PROFİL MODALI -->
+    <div id="modal-profile-v2" class="modal-overlay">
+        <div class="modal-box" style="max-width: 380px; padding: 20px; max-height: 90vh; overflow-y: auto;">
+
+            <div class="profile-header">
+                <div style="position: relative; display: inline-block;">
+                    <div id="pAvatar" class="profile-avatar-huge">😎</div>
+                    <div id="pOnlineStatus" class="profile-online-badge status-offline"></div>
+                    <div id="btnChangeAvatarProfile" onclick="openAvatarChangeFromProfile()"
+                        style="display:none; position: absolute; bottom: 0; right: 0; background: #2d3436; color:white; border-radius: 50%; width:30px; height:30px; align-items:center; justify-content:center; cursor: pointer; border:2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3); font-size: 1rem; z-index: 10;">
+                        ✏️
+                    </div>
+                </div>
+                <h2 id="pName" style="margin: 10px 0 5px 0; color: #2d3436;">Kullanıcı</h2>
+                <div id="pBadges" style="margin-bottom: 5px;"></div>
+            </div>
+
+            <div class="profile-stats-grid">
+                <div class="p-stat-box">
+                    <div id="pLevel" class="p-stat-val">1</div>
+                    <div class="p-stat-label">Seviye</div>
+                </div>
+                <div class="p-stat-box">
+                    <div id="pGold" class="p-stat-val" style="color:#f1c40f;">0</div>
+                    <div class="p-stat-label">Altın</div>
+                </div>
+                <div class="p-stat-box">
+                    <div id="pWins" class="p-stat-val" style="color:#2ed573;">0</div>
+                    <div class="p-stat-label">Zafer</div>
+                </div>
+            </div>
+
+            <div class="profile-bio-box" style="text-align:left;">
+
+                <div id="btnEditBio" class="bio-edit-btn" style="display:none;" onclick="enableBioEdit()">✏️ Profili
+                    Düzenle
+                </div>
+
+                <div id="pViewMode">
+                    <p id="pBioText" style="margin-bottom:10px; font-style:italic; color:#555;">...</p>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; font-size:0.8rem; color:#333;">
+                        <div>📍 <b>Şehir:</b> <span id="pCityDisplay">-</span></div>
+                        <div>💼 <b>Meslek:</b> <span id="pJobDisplay">-</span></div>
+                        <div>🎂 <b>Yaş:</b> <span id="pAgeDisplay">-</span></div>
+                        <div>⚧ <b>Cinsiyet:</b> <span id="pGenderDisplay">-</span></div>
+                    </div>
+                    <div style="margin-top:8px; font-size:0.8rem;">
+                        🎨 <b>Hobiler:</b> <span id="pHobbyDisplay">-</span>
+                    </div>
+                </div>
+
+                <div id="pEditMode" style="display:none; margin-top:10px;">
+                    <label style="font-size:0.7rem; font-weight:bold;">Biyografi:</label>
+                    <textarea id="pBioInput" style="width:100%; font-size:0.8rem; padding:5px; margin-bottom:5px;"
+                        maxlength="50" placeholder="Kısa bir söz..."></textarea>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+                        <div>
+                            <label style="font-size:0.7rem;">Şehir:</label>
+                            <input id="pCityInput" type="text" maxlength="15" placeholder="İstanbul"
+                                style="padding:5px;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;">Meslek:</label>
+                            <input id="pJobInput" type="text" maxlength="15" placeholder="Öğrenci" style="padding:5px;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;">Doğum Yılı:</label>
+                            <input id="pBirthInput" type="number" placeholder="2000" style="padding:5px;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem;">Cinsiyet:</label>
+                            <select id="pGenderInput" style="padding:5px; height:38px;">
+                                <option value="">Belirtme</option>
+                                <option value="Erkek">Erkek</option>
+                                <option value="Kadın">Kadın</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <label style="font-size:0.7rem; margin-top:5px; display:block;">Hobiler:</label>
+                    <input id="pHobbyInput" type="text" maxlength="30" placeholder="Futbol, Müzik..."
+                        style="padding:5px;">
+
+                    <button id="btnSaveBio" class="btn-green"
+                        style="width:100%; padding:8px; margin-top:10px; font-size:0.8rem;"
+                        onclick="saveBio()">KAYDET</button>
+                </div>
+
+            </div>
+
+            <!-- PET SECTION (New) -->
+            <div id="profilePetSection"
+                style="margin-top:15px; border-top:1px solid #eee; padding-top:10px; display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h4 style="margin:0; color:#2d3436;">🐾 Evcil Hayvanlarım</h4>
+                    <button id="btnTogglePetList" class="btn-sm btn-blue" onclick="toggleProfilePetList()">GÖSTER
+                        ▼</button>
+                </div>
+
+                <div id="profilePetListContainer"
+                    style="display:none; margin-top:10px; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap:8px;">
+                    <!-- Pets will be rendered here -->
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top:10px;">
+                <button id="btnProfileDM" class="btn-blue" onclick="startDMFromProfile()">💬 MESAJ GÖNDER</button>
+                <button id="btnDeleteProfile" class="btn-red" onclick="deleteMyProfile()" style="display:none;">🗑️ PROFİLİ SİL</button>
+                <button class="btn-grey" onclick="closeModal('modal-profile-v2')">KAPAT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DM MODALI -->
+    <div id="modal-dm" class="modal-overlay">
+        <div class="modal-box" style="display:flex;flex-direction:column;height:80vh;">
+
+            <h3 id="dmTitle">Mesajlaşma</h3>
+
+            <div id="dmMessages" style="flex:1;overflow-y:auto;
+                background:#f5f5f5;
+                border-radius:10px;
+                padding:10px;
+                margin-bottom:10px;">
+            </div>
+
+            <input type="text" id="dmInput" placeholder="Mesaj yaz...">
+
+            <button class="btn-green" onclick="sendDM()">Gönder</button>
+
+            <button class="btn-grey" style="margin-top:5px;" onclick="closeModal('modal-dm')">
+                Kapat
+            </button>
+
+        </div>
+    </div>
+        <div id="modal-setup" class="modal-overlay" style="backdrop-filter: blur(10px);">
+        <div class="modal-box"
+            style="padding: 0; max-width: 420px; width: 90%; background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; max-height: 85vh;">
+
+            <div
+                style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 15px; color: white; text-align: center; position: relative; flex-shrink: 0;">
+                <h3 style="margin:0; font-size: 1.3rem; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    OYUN MODU</h3>
+                <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 3px;">Mücadele türünü seç</div>
+            </div>
+
+            <div style="padding: 15px; background: #f4f6f8; overflow-y: auto; flex: 1;">
+
+                <!-- SINGLE PLAYER & PvC -->
+                <div style="background: white; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee; margin-bottom: 15px; position: relative; overflow: hidden;">
+                    <div style="position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #9b59b6;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-left: 8px;">
+                        <span style="font-weight: 800; color: #2d3436; font-size: 0.9rem;">👤 TEK KİŞİLİK / PvC</span>
+                    </div>
+
+                    <div style="display: flex; gap: 6px; margin-bottom:10px;">
+                        <select id="singleDiffSelect" style="flex:1; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; background: #fdfdfd; font-weight: 600;">
+                            <option value="3">3 Basamaklı</option>
+                            <option value="4" selected>4 Basamaklı</option>
+                            <option value="5">5 Basamaklı</option>
+                        </select>
+                        <select id="singleMode" style="flex:1; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; background: #fdfdfd; font-weight: 600;" onchange="toggleTimeSelect('single')">
+                            <option value="classic">⚡ Haklı</option>
+                            <option value="timed">⏱️ Süreli</option>
+                        </select>
+                    </div>
+
+                    <select id="singleDuration" style="display:none; width:100%; margin-bottom:10px; padding:8px; border-radius:8px; border:1px solid #dfe6e9;">
+                        <option value="3">3 Dakika</option>
+                        <option value="5">5 Dakika</option>
+                    </select>
+
+                    <div style="margin-top: 5px; padding: 8px; background: rgba(0,0,0,0.03); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #555;">🤖 Bilgisayara Karşı</label>
+                            <input type="checkbox" id="checkVsCpu" style="width: 20px; height: 20px;" onchange="document.getElementById('pvcSecretDiv').style.display = this.checked ? 'block' : 'none'">
+                        </div>
+                        <div id="pvcSecretDiv" style="display:none; margin-top:10px;">
+                            <input type="tel" id="playerSecretInput" placeholder="Tutacağın sayı (Opsiyonel)" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc; text-align:center; letter-spacing:3px;">
+                            <small style="color:#999; font-size:0.7rem; display:block; text-align:center;">Boş bırakırsan sistem tutar</small>
+                        </div>
+                    </div>
+
+                    <button onclick="startSingle()" class="btn-green" style="margin-top: 10px; width: 100%; border-radius: 8px; padding: 10px; background: linear-gradient(135deg, #2ecc71, #27ae60);">BAŞLA</button>
+                </div>
+
+                <div style="text-align: center; margin: -25px 0 8px 0; position: relative; z-index: 2;">
+                    <span style="background: #fff; border: 2px solid #eee; padding: 3px 8px; border-radius: 20px; font-size: 0.65rem; color: #999; font-weight: bold;">VEYA</span>
+                </div>
+
+                <!-- ONLINE -->
+                <div style="background: white; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee; position: relative; overflow: hidden; margin-bottom: 15px;">
+                    <div style="position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #3498db;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-left: 8px;">
+                        <span style="font-weight: 800; color: #2d3436; font-size: 0.9rem;">🌍 ONLINE DÜELLO</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                        <select id="createDiff" style="padding: 6px; border-radius: 6px; border: 1px solid #dbeafe; font-size: 0.75rem; font-weight:600;">
+                            <option value="3">3 Basamak</option>
+                            <option value="4" selected>4 Basamak</option>
+                            <option value="5">5 Basamak</option>
+                        </select>
+                        <select id="createPlayStyle" style="padding: 6px; border-radius: 6px; border: 1px solid #dbeafe; font-size: 0.75rem; font-weight:600;" onchange="toggleTimeSelect('create')">
+                            <option value="turn">⚡ Haklı</option>
+                            <option value="timed">⏱️ Süreli</option>
+                        </select>
+                        <select id="createMode" style="display:none;">
+                            <option value="classic">Klasik</option>
+                        </select>
+                    </div>
+
+                    <div id="timeSelectDiv" style="display:none; margin-bottom:10px;">
+                        <select id="createDuration" style="width:100%; padding:8px; border-radius:8px; border:1px solid #dfe6e9;">
+                            <option value="3">3 Dakika</option>
+                            <option value="5">5 Dakika</option>
+                        </select>
+                    </div>
+
+                    <button onclick="createRoom()" class="btn-blue" style="margin-bottom:10px; width:100%; padding: 10px; font-size: 0.9rem;">ODA KUR (50💰)</button>
+
+                    <div style="display: flex; gap: 5px; align-items: center; background: #fff; border-top: 2px solid #f1f2f6; padding-top: 8px;">
+                        <input type="tel" id="joinCode" placeholder="Oda Kodu" style="flex: 1; padding: 8px; border-radius: 6px; border: 2px solid #eee; text-align: center; font-size: 0.9rem; margin:0;">
+                        <button onclick="joinRoom(document.getElementById('joinCode').value)" class="btn-purple" style="width: auto; padding: 8px 12px; border-radius: 6px; margin:0;">GİR</button>
+                    </div>
+
+                    <!-- Online Player List -->
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:10px;">
+                        <div style="font-size:0.75rem; font-weight:bold; color:#555; margin-bottom:5px;">🟢 Aktif Oyuncular (Sayı Daveti)</div>
+                        <div id="activePlayersList" class="list-container" style="height:120px; background:#fafafa;">
+                           <div style="padding:10px; text-align:center; color:#999;">Yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="padding: 10px; background: #fff; text-align: center; border-top: 1px solid #eee; flex-shrink: 0;">
+                <button onclick="closeModal('modal-setup')" style="background: transparent; color: #b2bec3; font-weight: bold; border: none; font-size: 0.85rem; padding: 5px; width: 100%; cursor: pointer;">VAZGEÇ</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="modal-word-setup" class="modal-overlay" style="backdrop-filter: blur(10px);">
+        <div class="modal-box"
+            style="padding: 0; max-width: 420px; width: 90%; background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; max-height: 85vh;">
+
+            <div
+                style="background: linear-gradient(135deg, #6c5ce7, #a29bfe); padding: 15px; color: white; text-align: center; position: relative; flex-shrink: 0;">
+                <h3 style="margin:0; font-size: 1.3rem; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    OYUN
+                    MODU</h3>
+                <div style="font-size: 0.75rem; opacity: 0.8; margin-top: 3px;">Mücadele türünü seç</div>
+                <div style="position: absolute; top: 10px; right: 15px; font-size: 1.5rem; opacity: 0.2;">🎮</div>
+            </div>
+
+            <div style="padding: 15px; background: #f4f6f8; overflow-y: auto; flex: 1;">
+
+                <!-- SINGLE PLAYER & PvC -->
+                <div style="background: white; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee; margin-bottom: 15px; position: relative; overflow: hidden;">
+                    <div style="position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #9b59b6;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-left: 8px;">
+                        <span style="font-weight: 800; color: #2d3436; font-size: 0.9rem;">👤 TEK KİŞİLİK / PvC</span>
+                    </div>
+
+                    <div style="margin-bottom:10px;">
+                        <label style="font-size:0.75rem; font-weight:bold; color:#666;">Kelime Uzunluğu:</label>
+                        <select id="wordDiffSelect" style="width:100%; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; background: #fdfdfd; font-weight: 600;">
+                            <option value="3">3 Harfli</option>
+                            <option value="4">4 Harfli</option>
+                            <option value="5" selected>5 Harfli</option>
+                            <option value="6">6 Harfli</option>
+                            <option value="7">7 Harfli</option>
+                            <option value="8">8 Harfli</option>
+                            <option value="9">9 Harfli</option>
+                            <option value="10">10 Harfli</option>
+                        </select>
+                    </div>
+
+                    <!-- Mode Selection -->
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <label style="flex:1; display:flex; align-items:center; gap:5px; padding:5px; border:1px solid #eee; border-radius:8px; cursor:pointer;" onclick="toggleWordMode('single', 'time')">
+                            <input type="radio" name="wordSingleMode" id="radioSingleTime" checked>
+                            <span style="font-size:0.8rem; font-weight:bold;">⏱️ Süreli</span>
+                        </label>
+                        <label style="flex:1; display:flex; align-items:center; gap:5px; padding:5px; border:1px solid #eee; border-radius:8px; cursor:pointer;" onclick="toggleWordMode('single', 'moves')">
+                            <input type="radio" name="wordSingleMode" id="radioSingleMoves">
+                            <span style="font-size:0.8rem; font-weight:bold;">⚡ Haklı</span>
+                        </label>
+                    </div>
+
+                    <!-- Options -->
+                    <div id="singleTimeOptions">
+                        <select id="wordTimeSelect" style="width:100%; padding: 8px; border-radius: 8px; border: 1px solid #dfe6e9; background: #fdfdfd; font-weight: 600;">
+                            <option value="3">3 Dakika</option>
+                            <option value="5" selected>5 Dakika</option>
+                            <option value="7">7 Dakika</option>
+                        </select>
+                    </div>
+                    <div id="singleMoveOptions" style="display:none; text-align:center; padding:10px; background:#f0f2f5; border-radius:8px; color:#2d3436; font-weight:bold; border:1px dashed #ccc;">
+                        15 HAK (Standart)
+                    </div>
+
+                    <div style="margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.03); border-radius: 8px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <label style="font-size: 0.8rem; font-weight: bold; color: #555;">🤖 Bilgisayara Karşı</label>
+                            <input type="checkbox" id="checkWordVsCpu" style="width: 20px; height: 20px;">
+                        </div>
+                    </div>
+
+                    <button onclick="startWordGameCustom()" class="btn-green" style="margin-top: 10px; width: 100%; border-radius: 8px; padding: 10px; background: linear-gradient(135deg, #8e44ad, #9b59b6);">BAŞLA</button>
+                </div>
+
+                <div style="text-align: center; margin: -25px 0 8px 0; position: relative; z-index: 2;">
+                    <span style="background: #fff; border: 2px solid #eee; padding: 3px 8px; border-radius: 20px; font-size: 0.65rem; color: #999; font-weight: bold;">VEYA</span>
+                </div>
+
+                <!-- ONLINE -->
+                <div style="background: white; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee; position: relative; overflow: hidden; margin-bottom: 15px;">
+                    <div style="position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: #3498db;"></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-left: 8px;">
+                        <span style="font-weight: 800; color: #2d3436; font-size: 0.9rem;">🌍 ONLINE DÜELLO</span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                        <select id="createWordDiff" style="padding: 6px; border-radius: 6px; border: 1px solid #dbeafe; font-size: 0.75rem; font-weight:600;">
+                            <option value="3">3 Harf</option>
+                            <option value="4">4 Harf</option>
+                            <option value="5" selected>5 Harf</option>
+                            <option value="6">6 Harf</option>
+                            <option value="7">7 Harf</option>
+                            <option value="8">8 Harf</option>
+                            <option value="9">9 Harf</option>
+                            <option value="10">10 Harf</option>
+                        </select>
+                        <button onclick="createWordRoom()" class="btn-blue" style="margin:0; padding: 5px; font-size: 0.7rem;">ODA KUR (50💰)</button>
+                    </div>
+
+                     <!-- Online Mode Selection -->
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <label style="flex:1; display:flex; align-items:center; gap:5px; padding:5px; border:1px solid #eee; border-radius:8px; cursor:pointer;" onclick="toggleWordMode('online', 'time')">
+                            <input type="radio" name="wordOnlineMode" id="radioOnlineTime" checked>
+                            <span style="font-size:0.7rem; font-weight:bold;">⏱️ Süreli (5dk)</span>
+                        </label>
+                        <label style="flex:1; display:flex; align-items:center; gap:5px; padding:5px; border:1px solid #eee; border-radius:8px; cursor:pointer;" onclick="toggleWordMode('online', 'moves')">
+                            <input type="radio" name="wordOnlineMode" id="radioOnlineMoves">
+                            <span style="font-size:0.7rem; font-weight:bold;">⚡ Haklı (15)</span>
+                        </label>
+                    </div>
+
+                    <div style="display: flex; gap: 5px; align-items: center; background: #fff; border-top: 2px solid #f1f2f6; padding-top: 8px;">
+                        <input type="tel" id="joinWordCode" placeholder="Oda Kodu" style="flex: 1; padding: 8px; border-radius: 6px; border: 2px solid #eee; text-align: center; font-size: 0.9rem; margin:0;">
+                        <button onclick="joinWordRoom(document.getElementById('joinWordCode').value)" class="btn-purple" style="width: auto; padding: 8px 12px; border-radius: 6px; margin:0;">GİR</button>
+                    </div>
+
+                    <!-- Online Player List -->
+                    <div style="margin-top:10px; border-top:1px dashed #ddd; padding-top:10px;">
+                        <div style="font-size:0.75rem; font-weight:bold; color:#555; margin-bottom:5px;">🟢 Aktif Oyuncular (Kelime Daveti)</div>
+                        <div id="wordActivePlayersList" class="list-container" style="height:120px; background:#fafafa;">
+                           <div style="padding:10px; text-align:center; color:#999;">Yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+
+</div>
+
+            <div style="padding: 10px; background: #fff; text-align: center; border-top: 1px solid #eee; flex-shrink: 0;">
+                <button onclick="closeModal('modal-word-setup')" style="background: transparent; color: #b2bec3; font-weight: bold; border: none; font-size: 0.85rem; padding: 5px; width: 100%; cursor: pointer;">VAZGEÇ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORD CAREER MAP MODAL -->
+    <div id="modal-word-career" class="modal-overlay">
+        <div style="position:absolute; top:20px; right:20px; z-index:100;">
+            <button class="nav-btn" onclick="closeModal('modal-word-career')" style="width:40px; height:40px; font-size:1.2rem;">X</button>
+        </div>
+        <div id="wordCareerContent" style="width:100%; height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;">
+            <!-- Generated by JS -->
+        </div>
+    </div>
+
+
+
+    <div id="modal-market" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🛒 Market</h3>
+            <p style="font-size:0.8rem;color:#ccc;">Tüm Ürünler Reklam İzleyerek Alınır!</p>
+            <div id="marketItems" style="text-align:left;max-height:300px;overflow-y:auto;"></div><button
+                onclick="closeModal('modal-market')" class="btn-red">KAPAT</button>
+        </div>
+    </div>
+    <div id="modal-inventory" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🎒 Çanta</h3>
+            <div id="inventoryList"></div><button onclick="closeModal('modal-inventory')" class="btn-red">KAPAT</button>
+        </div>
+    </div>
+    <div id="modal-leaderboard" class="modal-overlay">
+        <div class="modal-box" style="max-width: 400px;">
+            <h3 style="margin-bottom: 15px;">🏆 Sıralama</h3>
+            <div style="display:flex; gap:5px; margin-bottom:15px; background: #f0f2f5; padding: 8px; border-radius: 12px;">
+                <button id="lbBtnDaily" class="btn-green" onclick="loadLeaderboard('daily')" style="flex:1; font-size:0.8rem; padding:8px 5px;">📅 Günlük</button>
+                <button id="lbBtnWeekly" class="btn-blue" onclick="loadLeaderboard('weekly')" style="flex:1; font-size:0.8rem; padding:8px 5px;">🗓️ Haftalık</button>
+                <button id="lbBtnAll" class="btn-gold" onclick="loadLeaderboard('all')" style="flex:1; font-size:0.8rem; padding:8px 5px;">♾️ Genel</button>
+            </div>
+            <div id="lbContent" class="list-container" style="min-height:200px; max-height: 400px; overflow-y: auto;"></div>
+            <button onclick="closeModal('modal-leaderboard')" class="btn-red" style="margin-top: 10px;">KAPAT</button>
+        </div>
+    </div>
+    <div id="modal-more" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🍔 Diğer</h3>
+            <button class="btn-gold" onclick="openVaultModal()">🔐 Günlük Kasa</button>
+            <button class="btn-dark" onclick="openPetModalSafe()">🐾 Evcil Hayvanlar</button>
+            <button class="btn-dark" onclick="openAvatarChange()">😎 Avatar Değiştir</button>
+            <button class="btn-purple" onclick="showModal('modal-features')">✨ Oyun Özellikleri</button>
+            <button class="btn-dark" onclick="showModal('modal-contact')">📨 İletişim</button>
+            <button class="btn-red" style="margin-top:15px;" onclick="confirmLogout()">ÇIKIŞ YAP</button>
+            <button class="btn-grey" onclick="closeModal('modal-more')">KAPAT</button>
+        </div>
+    </div>
+
+    <!-- OYUN ÖZELLİKLERİ MODAL -->
+    <div id="modal-features" class="modal-overlay">
+        <div class="modal-box" style="max-width: 400px; max-height: 85vh; overflow-y: auto;">
+            <h3 style="color: #8e44ad; margin-bottom: 15px;">✨ Oyun Özellikleri</h3>
+
+            <div style="text-align: left; font-size: 0.9rem; line-height: 1.6;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 1rem;">🎮 Oyun Modları</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li><b>Sayı Tahmin:</b> Klasik + - mantığı ile oyna</li>
+                        <li><b>Kelime Hazinesi:</b> Türkçe kelime bulma oyunu</li>
+                        <li><b>Tek Kişilik:</b> Bilgisayara karşı pratik yap</li>
+                        <li><b>Online:</b> Gerçek oyunculara karşı mücadele et</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 1rem;">🏆 Kariyer Modu</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li>Seviye atlama sistemi (1-5 arası)</li>
+                        <li>Her seviyede 10 galibiyet hedefi</li>
+                        <li>Seviye yükseldikçe zorluk artar</li>
+                        <li>Her seviyede özel ödüller</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 1rem;">💰 Ek Özellikler</h4>
+                    <ul style="margin: 0; padding-left: 20px;">
+                        <li><b>Günlük Kasa:</b> Her gün ücretsiz altın</li>
+                        <li><b>Evcil Hayvanlar:</b> Seninle birlikte yürüyen dostlar</li>
+                        <li><b>Market:</b> Özel eşyalar ve güçlendirmeler</li>
+                        <li><b>Sıralama:</b> Günlük, haftalık ve genel liderlik</li>
+                        <li><b>Ödül Avcıları:</b> Diğer oyuncuların ödüllerini avla</li>
+                    </ul>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: #1a5f3f; padding: 15px; border-radius: 12px;">
+                    <h4 style="margin: 0 0 10px 0; font-size: 1rem;">🎯 Nasıl Oynanır?</h4>
+                    <p style="margin: 0; font-size: 0.85rem;">
+                        <b>+X -Y</b> sistemi: +X doğru yerdeki rakam sayısı, -Y yanlış yerdeki rakam sayısı.<br>
+                        Örnek: Gizli sayı 1234, tahmin 1567 → <b>+1 -0</b> (1 doğru yerde)<br>
+                        Tahmin 5612 → <b>+0 -2</b> (1 ve 2 var ama yanlış yerde)
+                    </p>
+                </div>
+            </div>
+
+            <button onclick="closeModal('modal-features')" class="btn-purple" style="margin-top: 15px; width: 100%;">KAPAT</button>
+        </div>
+    </div>
+
+    <div id="modal-inbox" class="modal-overlay">
+        <div class="modal-box">
+            <h3>📬 Gelen Kutusu</h3>
+            <p style="font-size:0.8rem; color:#666;">Son konuşmaların burada görünür.</p>
+
+            <div id="inboxList" class="list-container" style="max-height:300px; overflow-y:auto; margin-bottom:15px;">
+                Yükleniyor...
+            </div>
+
+            <button class="btn-blue" onclick="openNewChatPrompt()">➕ Yeni Sohbet Başlat</button>
+            <button class="btn-red" style="margin-top:5px;" onclick="closeModal('modal-inbox')">KAPAT</button>
+        </div>
+    </div>
+    <div id="modal-avatar-change" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Avatar Seç</h3>
+            <div class="avatar-wrapper" id="changeAvatarList"></div><button onclick="closeModal('modal-avatar-change')"
+                class="btn-red" style="margin-top:10px;">İPTAL</button>
+        </div>
+    </div>
+
+    <div id="modal-career-info" class="modal-overlay">
+        <div class="modal-box" style="max-width:380px; text-align:center;">
+            <h3>🗺️ Kariyer Yolu (Saga)</h3>
+
+            <p style="font-size:0.9rem; color:#333; line-height:1.5;">
+                Kariyer Yolu, oyunun hikâye ve ilerleme modudur.
+                Her seviye bir bölgeyi temsil eder.
+            </p>
+
+            <div style="background:#f1f2f6; border-radius:12px; padding:10px; text-align:left; font-size:0.85rem;">
+                🔹 Her seviyede <b>10 galibiyet</b> alırsan bir üst seviye açılır.<br>
+                🔹 Seviye yükseldikçe sayı zorluğu artar.<br>
+                🔹 Kahin, hak sayısı ve süre kısıtları değişir.<br>
+                🔹 Son seviyeyi bitiren oyuncu <b>Kariyer Şampiyonu</b> olur.
+            </div>
+
+            <button class="btn-green" style="margin-top:15px;" onclick="closeModal('modal-career-info')">TAMAM</button>
+        </div>
+    </div>
+
+    <div id="modal-career" class="modal-overlay">
+        <div class="modal-box"
+            style="height: 85vh; padding: 0; background: #f0f2f5; display: flex; flex-direction: column;">
+            <div style="padding: 15px; background: #fff; border-bottom: 1px solid #eee;">
+                <h3 style="margin:0; color:#2d3436;">🗺️ KARİYER YOLU</h3>
+                <small style="color:#666;">Zirveye ulaşabilir misin?</small>
+            </div>
+
+            <div style="flex: 1; overflow-y: auto; padding: 20px;" id="careerMapContent">
+            </div>
+
+            <div id="careerLevelSetupModal" class="modal-overlay" style="z-index: 3100;">
+                <div class="modal-box" style="max-width: 300px;">
+                    <h3 id="careerLevelTitle">Seviye 1</h3>
+                    <p id="careerLevelDesc" style="font-size:0.8rem; color:#666;"></p>
+                    <div
+                        style="background:#fff3cd; padding:8px; border-radius:5px; font-size:0.7rem; color:#856404; margin-bottom:10px;">
+                        ⚠️ <span id="careerRestrictionText">Kısıtlama Yok</span>
+                    </div>
+
+                    <label style="font-weight:bold; font-size:0.8rem;">Oyun Modu Seç:</label>
+                    <select id="careerModeSelect" style="width:100%; padding:8px; margin-top:5px; margin-bottom:10px;"
+                        onchange="toggleCareerTimeSelect()">
+                        <option value="classic">🎯 Klasik (Haklı)</option>
+                        <option value="timed">⏱️ Süreli (Zamanlı)</option>
+                    </select>
+
+                    <div id="careerTimeDiv" style="display:none;">
+                        <label style="font-weight:bold; font-size:0.8rem;">Süre Seç:</label>
+                        <select id="careerTimeSelect"
+                            style="width:100%; padding:8px; margin-top:5px; font-weight:bold; color:#e74c3c;"></select>
+                    </div>
+
+                    <button class="btn-green" onclick="launchCareerGame()" style="margin-top:15px;">BAŞLA</button>
+                    <button class="btn-red" onclick="closeModal('careerLevelSetupModal')"
+                        style="margin-top:5px;">İPTAL</button>
+                </div>
+            </div>
+
+            <button onclick="closeModal('modal-career')" class="btn-grey" style="margin: 10px;">KAPAT</button>
+        </div>
+    </div>
+
+    <div id="modal-contact" class="modal-overlay">
+        <div class="modal-box">
+            <h3>📨 İletişim</h3><textarea id="adminMsgInput"></textarea><button onclick="sendAdminMessage()"
+                class="btn-blue">GÖNDER</button><button onclick="closeModal('modal-contact')"
+                class="btn-red">İPTAL</button>
+        </div>
+    </div>
+
+    <div id="modal-vault" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🔐 Günlük Kasa</h3>
+            <p style="font-size:0.8rem;color:#ccc;">24 Saatte 1 Kez Açılabilir</p>
+            <div class="vault-container" id="vaultContainer">
+                <div class="vault-body">
+                    <div class="vault-inside">
+                        <div style="font-size:3rem;">💎</div>
+                        <h2 id="vaultRewardDisplay"
+                            style="color:#fff; text-shadow:0 2px 5px rgba(0,0,0,0.5); margin:5px 0;">???</h2>
+                        <small style="color:#fff; font-weight:bold;">ALTIN KAZANDIN!</small>
+                    </div>
+
+                    <div class="vault-door">
+                        <div class="vault-status-light" id="vaultLight"></div>
+                        <div class="vault-handle-base" id="vaultHandle">
+                            <div class="vault-handle-bars"></div>
+                            <div class="vault-handle-bars vertical"></div>
+                            <div class="vault-knob"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vaultTimerText" style="margin-top:15px; font-weight:bold; color:#e74c3c; display:none;">
+                ⏳ Kilitli! <span id="vaultTimeLeft"></span> sonra gel.
+            </div>
+
+            <button id="btnOpenVault" class="btn-gold"
+                style="width:100%; margin-top:15px; padding:12px; font-size:1rem; border-radius:12px; box-shadow:0 4px 10px rgba(241, 196, 15, 0.3);"
+                onclick="openVault()">
+                🔐 ŞİFREYİ GİR VE AÇ
+            </button>
+            <button onclick="closeModal('modal-vault')" class="btn-red">KAPAT</button>
+        </div>
+    </div>
+    <div id="modal-levelup" class="modal-overlay">
+        <div class="modal-box">
+            <h3>⭐ SEVİYE ATLADIN!</h3>
+            <h1 id="newLevelDisplay">1</h1>
+            <p style="font-size:1.1rem; font-weight:bold; color:#f1c40f; margin-top:5px;">+50 Altın!</p><button
+                onclick="closeModal('modal-levelup')" class="btn-purple">HARİKA</button>
+        </div>
+    </div>
+    <div id="modal-end" class="modal-overlay">
+        <div class="modal-box">
+            <h2 id="endTitle">OYUN BİTTİ</h2>
+            <p id="endMsg"></p>
+
+            <div id="rematchSettings"
+                style="display:none; margin:15px 0; background:#f0f2f5; padding:10px; border-radius:10px;">
+                <label style="font-size:0.8rem; font-weight:bold; color:#555;">Yeni Oyun Zorluğu:</label>
+                <select id="rematchDiffSelect"
+                    style="width:100%; margin-top:5px; padding:8px; border-radius:5px; border:1px solid #ccc; font-weight:bold;">
+                    <option value="4">4 Hane (Normal)</option>
+                    <option value="5">5 Hane (Zor)</option>
+                    <option value="6">6 Hane (Çok Zor)</option>
+                    <option value="7">7 Hane (İmkansız)</option>
+                </select>
+            </div>
+
+            <div id="incomingRematchArea"
+                style="display:none; margin:15px 0; background:#e8f5e9; padding:15px; border-radius:10px; border:1px solid #4caf50;">
+                <h4 style="margin:0 0 5px 0; color:#2e7d32;">🔥 RÖVANŞ İSTEĞİ!</h4>
+                <p id="incomingRematchText" style="margin:0; font-size:0.9rem; color:#333;">Rakip 5 Haneli oyun istiyor.
+                </p>
+                <div style="display:flex; gap:10px; margin-top:10px; justify-content:center;">
+                    <button id="btnAcceptRematch" class="btn-green" onclick="acceptRematch()">KABUL ET</button>
+                    <button class="btn-red" onclick="rejectRematch()">REDDET</button>
+                </div>
+            </div>
+
+            <div id="endButtons" style="display:none; gap:10px; justify-content:center;">
+                <button id="btnRematch" onclick="requestRematch()" class="btn-green">TEKRAR OYNA</button>
+                <button onclick="leaveRoom()" class="btn-red">ÇIK</button>
+            </div>
+
+            <p id="rematchStatus" style="color:var(--primary); font-weight:bold; margin-top:10px; font-size:0.8rem;">
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-pet-help" class="modal-overlay">
+        <div class="modal-box"
+            style="border: 2px solid var(--gold); background: linear-gradient(135deg, #2d3436, #000); color: white;">
+            <div id="petHelpIcon" style="font-size: 4rem; margin-bottom: 10px;">🐾</div>
+            <h3 style="color:var(--gold); margin-bottom: 15px;">DOSTUNDAN YARDIM!</h3>
+            <p id="petHelpMsg" style="font-size:1.1rem; line-height: 1.5; margin-bottom: 20px;">
+                Sahibi, pes etme! Sana biraz daha zaman ve şans getirdim.
+            </p>
+            <div id="petHelpReward" style="font-size: 1.5rem; font-weight: bold; color: #2ecc71; margin-bottom: 20px;">
+                +3 HAK / +30 SN
+            </div>
+            <button class="btn-gold" onclick="closeModal('modal-pet-help')"
+                style="width: 100%; padding: 12px; font-weight: bold;">TEŞEKKÜRLER!</button>
+        </div>
+    </div>
+
+    <!-- PIGGY BANK WIN OVERLAY (ONLY FOR WINS) -->
+    <div id="piggyWinOverlay" class="piggy-overlay">
+        <div class="piggy-container">
+            <div class="piggy-icon">🏦</div>
+            <div class="piggy-glow"></div>
+            <h2 class="piggy-title">KAZANDIN!</h2>
+            <div id="piggyAmount" class="piggy-amount">+0 Altın</div>
+            <div class="piggy-fill-container">
+                <div id="piggyFillBar" class="piggy-fill-bar"></div>
+            </div>
+            <div id="coinDropLayer" class="coin-drop-layer"></div>
+            <!-- BUTONLAR -->
+            <div id="piggyButtons" style="display:none; margin-top:25px; gap:10px; justify-content:center;">
+                <button class="btn-green" onclick="closePiggyAndReplay()" style="padding:15px 25px; font-size:1rem;">🔄
+                    TEKRAR OYNA</button>
+                <button class="btn-red" onclick="closePiggyAndExit()" style="padding:15px 25px; font-size:1rem;">🚪
+                    ÇIKIŞ</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-feedback" class="modal-overlay">
+        <div class="modal-box">
+            <h3>📢 Geri Bildirim</h3>
+            <p style="color:#eee;font-size:0.8rem;">Oyunla ilgili hata veya önerini yaz.</p><textarea id="feedbackInput"
+                placeholder="Mesajınız..." style="height:100px;"></textarea><button onclick="submitFeedback()"
+                class="btn-blue">GÖNDER</button><button onclick="closeModal('modal-feedback')"
+                class="btn-red">İPTAL</button>
+        </div>
+    </div>
+
+
+    <div id="screen-wait" class="screen">
+        <div class="card"><button class="btn-red"
+                style="width:auto;padding:5px 15px;font-size:0.9rem;z-index:9999;position:relative;"
+                ontouchstart="attemptExit()" onclick="attemptExit()">ÇIKIŞ</button><br>
+            <h2>Bekleniyor...</h2>
+            <div id="roomCodeDisplay"
+                style="font-size:3rem;background:rgba(255,255,255,0.2);padding:10px;letter-spacing:5px;"></div>
+            <p id="roomModeInfo"></p>
+            <h4>Davet Et</h4>
+            <div id="inviteListWait" class="list-container"></div>
+        </div>
+    </div>
+
+    <div id="screen-game" class="screen">
+        <div class="card"
+            style="display:flex;justify-content:space-between;background:rgba(0,0,0,0.8);color:white;padding:10px;">
+            <div id="p1Indicator" class="turn-indicator">P1</div>
+            <div id="timerDisplay" style="color:var(--gold);display:none;font-weight:bold;"></div>
+            <div id="gamePetDisplay"></div>
+            <div id="p2Indicator" class="turn-indicator">P2</div>
+        </div>
+        <div class="card" id="gameCard">
+            <div style="display:flex;justify-content:space-between;"><button class="btn-red"
+                    style="width:auto;padding:5px 15px;font-size:0.9rem;z-index:9999;position:relative;"
+                    ontouchstart="attemptExit()" onclick="attemptExit()">ÇIKIŞ</button>
+                <div style="text-align:right;"><span id="rightsDisplay"
+                        style="font-weight:bold;color:var(--danger);">Hak:
+                        15</span><button class="btn-gold" style="padding:2px 8px;font-size:0.7rem;width:auto;"
+                        onclick="useHint()">📺 İpucu (Reklam)</button></div>
+            </div>
+            <div class="item-bar"><button class="item-btn" onclick="useItem('oracle')">🔮 Kahin<div id="qty-oracle"
+                        class="item-count">0</div></button><button class="item-btn" onclick="useItem('freeze')">❄️ Zaman
+                    <div id="qty-freeze" class="item-count">0</div>
+                </button><button id="btnSabotage" class="item-btn" onclick="useItem('sabotage')">😈 Sabotaj<div
+                        id="qty-sabotage" class="item-count">0</div></button>
+            </div>
+            <button id="btnPetHelpOption" onclick="acceptPetHelp()" class="btn-gold pulse-active" style="display:none; margin: 15px auto 5px auto; padding: 10px; font-size: 0.9rem; border-radius: 12px; box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);">🐾 YARDIM AL (-30⚡)</button>
+
+            <input type="tel" id="guessInput" placeholder="____"
+                style="font-size:24px;letter-spacing:5px;margin-top:20px;" autocomplete="off"><button id="btnGuess"
+                class="btn-green" onclick="makeGuess()" style="height:50px;">TAHMİN
+                ET</button>
+            <div class="emoji-bar"><button class="emoji-btn" onclick="sendEmoji('👍')">👍</button><button
+                    class="emoji-btn" onclick="sendEmoji('😂')">😂</button><button class="emoji-btn"
+                    onclick="sendEmoji('😎')">😎</button><button class="emoji-btn"
+                    onclick="sendEmoji('😱')">😱</button><button class="emoji-btn" onclick="sendEmoji('😡')">😡</button>
+            </div>
+            <ul id="history" style="list-style:none;padding:0;margin-top:10px;max-height:200px;overflow-y:auto;"></ul>
+            <div style="margin-top:15px;border-top:1px solid #eee;padding-top:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <button id="btnGameChatToggle" class="btn-grey"
+                        style="font-size:0.7rem;padding:5px;width:auto;position:relative;" onclick="toggleGameChat()">
+                        💬 Sohbet
+                        <span id="gameChatBadge"
+                            style="display:none; position:absolute; top:-5px; right:-5px; width:10px; height:10px; background:red; border-radius:50%; border:1px solid white;"></span>
+                    </button>
+                    <button id="btnBlockChat" class="btn-dark" style="font-size:0.7rem;padding:5px;width:auto;"
+                        onclick="toggleChatBlock()">🚫 Engelle</button>
+                    <button class="btn-gold" style="font-size:0.7rem;padding:5px;width:auto;"
+                        onclick="showModal('modal-feedback')">📢 Bildir</button>
+                </div>
+                <div id="gameChatContainer">
+                    <div
+                        style="display:flex;justify-content:space-between;margin-bottom:5px;color:#eee;font-size:0.8rem;">
+                        <span>💬 Canlı Sohbet</span><span onclick="toggleGameChat()"
+                            style="cursor:pointer;color:#bbb;">Kapat ▲</span>
+                    </div>
+                    <div id="gameChatBox" class="game-chat-box"></div>
+                    <div style="display:flex;gap:5px;margin-top:5px;"><input id="gameChatInput" placeholder="Mesaj..."
+                            style="padding:8px;margin:0;text-shadow:none;"><button class="btn-blue"
+                            style="width:auto;margin:0;padding:5px 10px;" onclick="sendGameChat()">➤</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div id="screen-admin" class="screen">
+        <div class="card"><button class="nav-btn" onclick="handleBackButton()">⬅</button>
+            <h2>👑 Pro Yönetim</h2>
+            <div class="admin-dashboard">
+                <div class="admin-card">
+                    <h4>👥 Üye</h4>
+                    <div class="val" id="totalUserCount">0</div>
+                </div>
+                <div class="admin-card">
+                    <h4>🟢 Online</h4>
+                    <div class="val" id="statOnline">0</div>
+                </div>
+                <div class="admin-card">
+                    <h4>🏠 Odalar</h4>
+                    <div class="val" id="statRooms">0</div>
+                </div>
+            </div>
+
+            <!-- KULLANICILAR - EN BAŞA TAŞINDI -->
+            <div class="admin-section">
+                <h3>👥 Kullanıcılar</h3>
+                <div style="display:flex;gap:5px;margin-bottom:5px;">
+                    <button id="btnFilterOnline" class="btn-green" style="flex:1;padding:5px;font-size:0.7rem;" onclick="filterAdminUsers('online')">🟢 Online</button>
+                    <button id="btnFilterOffline" class="btn-grey" style="flex:1;padding:5px;font-size:0.7rem;" onclick="filterAdminUsers('offline')">⚫ Offline</button>
+                    <button id="btnFilterNew" class="btn-blue" style="flex:1;padding:5px;font-size:0.7rem;" onclick="filterAdminUsers('new')">🆕 Yeni</button>
+                </div>
+                <div id="adminUserList" class="list-container" style="max-height:300px;">Yükleniyor...</div>
+            </div>
+
+            <!-- TÜM MESAJLAR - YENİ EKLENDİ -->
+            <div class="admin-section">
+                <h3>💬 Tüm Oyuncu Mesajları</h3>
+                <button class="btn-purple" onclick="AdminMessenger.open()" style="width:100%; margin-bottom:10px;">📨 Tüm Mesajları Gör</button>
+            </div>
+
+            <div class="admin-section">
+                <h3>🛠️ Sistem</h3><input id="marqueeInput" placeholder="Kayan Yazı Gir..."
+                    style="font-size:0.8rem; padding:8px;"><button class="btn-blue" onclick="updateMarquee()"
+                    style="padding:8px; font-size:0.8rem;">GÜNCELLE</button>
+                <div style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;"><small
+                        style="color:#666; font-weight:bold;">🌧️ Altın Yağmuru (Çarpan)</small>
+                    <div style="display:flex; gap:5px; margin-top:3px;"><button class="btn-grey"
+                            onclick="setGoldMultiplier(1)" style="flex:1; padding:5px; font-size:0.7rem;">Normal
+                            (x1)</button><button class="btn-gold" onclick="setGoldMultiplier(2)"
+                            style="flex:1; padding:5px; font-size:0.7rem;">Başlat (x2)</button><button class="btn-red"
+                            onclick="setGoldMultiplier(5)" style="flex:1; padding:5px; font-size:0.7rem;">Dev
+                            (x5)</button>
+                    </div>
+                </div>
+
+                <div style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;">
+                    <small style="color:#666; font-weight:bold;">⚠️ Sıfırlama İşlemleri</small>
+                    <div style="display:flex; gap:5px; margin-top:3px;">
+                        <button class="btn-red" onclick="resetDailyJackpot()"
+                            style="flex:1; padding:5px; font-size:0.7rem;">🗑️ JACKPOT SİL</button>
+                        <button class="btn-red" onclick="resetSpeedRuns()"
+                            style="flex:1; padding:5px; font-size:0.7rem;">🗑️ SPEEDRUN SİL</button>
+                        <button class="btn-red" onclick="adminResetAllCareer()"
+                            style="flex:1; padding:5px; font-size:0.7rem; background:#d63031; border:1px solid red;">♻️
+                            KARİYER SIFIRLA</button>
+                        <button class="btn-red" onclick="adminResetWordCareer()"
+                            style="flex:1; padding:5px; font-size:0.7rem; background:#d63031; border:1px solid red;">♻️ KELİME SIFIRLA</button>
+                    </div>
+                </div>
+
+                <div style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;">
+                    <small style="color:#666; font-weight:bold;">⚙️ Sistem Kontrolü</small>
+                    <div style="display:flex; gap:5px; margin-top:3px;">
+                        <button id="btnTogglePet" class="btn-dark" onclick="toggleSystem('pet')"
+                            style="flex:1; padding:5px; font-size:0.7rem;">🐾 Pet: ...</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h3>📨 Gelen Mesajlar</h3>
+            <div id="adminMsgList" class="list-container" style="max-height:200px; overflow-y:auto;">
+                <div style="padding:10px; text-align:center;">Yükleniyor...</div>
+            </div>
+        </div>
+
+        <div class="admin-section">
+            <h3>📢 Şikayet & Bildirimler</h3>
+            <div id="adminReportList" class="list-container" style="max-height:200px;">Yükleniyor...</div>
+        </div>
+
+        <div class="admin-section">
+            <h3>📢 Duyuru</h3><input id="broadcastInput"><button class="btn-gold" onclick="sendBroadcast()">GÖNDER</button>
+        </div>
+    </div>
+
+    <!-- TÜM MESAJLAR MODAL - YENİ EKLENDİ -->
+</div>
+
+
+
+<!-- SANDIK ETKİLEŞİM MODALI -->
+
+
+<!-- SANDIK ÖDÜL MODALI -->
+<div id="modal-pet" class="modal-overlay">
+    <div class="modal-box"
+        style="width:90%; max-width:400px; height:80vh; padding:0; display:flex; flex-direction:column; overflow:hidden;">
+        <div
+            style="padding:15px; background:#f4f4f4; border-bottom:1px solid #ddd; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">🐾 Pet Kulübü</h3>
+            <button class="btn-sm btn-red" onclick="closeModal('modal-pet')">X</button>
+        </div>
+        <div id="petListContainer" style="flex:1; overflow-y:auto; padding:10px; background:#fff;"></div>
+        <div style="padding:15px; background:#fff; border-top:1px solid #eee; text-align:center;">
+            <button id="btnFeedPet" class="btn-green" style="width:100%; padding:15px; font-size:1rem;"
+                onclick="PetSystem.feedPet()">🍖 BESLE</button>
+            <small style="display:block; margin-top:5px; color:#999;">Enerji: Bonusların çalışmasını sağlar.</small>
+        </div>
+    </div>
+</div>
+
+
+<!-- MISSING MODAL RESTORED: Ad Watch / Web Mock -->
+<div id="modal-ad-watch" class="modal-overlay" style="z-index:99999;">
+    <div class="modal-box" style="text-align:center;">
+        <h3>📺 Reklam Yükleniyor...</h3>
+        <p>Lütfen bekleyin...</p>
+        <button class="btn-red" onclick="closeModal('modal-ad-watch')">Kapat</button>
+    </div>
+</div>
+<script src="./js/word_data.js"></script>
+    <script src="./js/app.js"></script>
+
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+    <!-- INVITE SELECTOR -->
+    <div id="modal-invite-selector" class="modal-overlay">
+        <div class="modal-box" style="text-align:center;">
+            <h3>Oyun Türü Seç</h3>
+            <p>Rakibini hangi oyuna davet etmek istersin?</p>
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
+                <button class="btn-blue" onclick="openInviteSetupNumber()" style="padding:15px; font-size:1.1rem;">🔢 SAYI TAHMİN</button>
+                <button class="btn-purple" onclick="openInviteSetupWord()" style="padding:15px; font-size:1.1rem;">🇹🇷 KELİME HAZİNESİ</button>
+                <button class="btn-grey" onclick="closeModal('modal-invite-selector')" style="margin-top:10px;">İPTAL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVITE SETUP NUMBER -->
+    <div id="modal-invite-setup-number" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🔢 Sayı Oyunu Daveti</h3>
+            <p>Oyun ayarlarını belirle:</p>
+
+            <label style="display:block; text-align:left; margin-bottom:5px;">Zorluk:</label>
+            <select id="inviteNumDiff" style="width:100%; padding:10px; margin-bottom:15px;">
+                <option value="3">3 Basamaklı</option>
+                <option value="4" selected>4 Basamaklı (Normal)</option>
+                <option value="5">5 Basamaklı (Zor)</option>
+                <option value="6">6 Basamaklı</option>
+            </select>
+
+            <label style="display:block; text-align:left; margin-bottom:5px;">Oyun Modu:</label>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <label style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; cursor:pointer;">
+                    <input type="radio" name="inviteNumMode" value="rights" checked onclick="document.getElementById('inviteNumRightsOpts').style.display='block';document.getElementById('inviteNumTimeOpts').style.display='none'">
+                    ⚡ Haklı
+                </label>
+                <label style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; cursor:pointer;">
+                    <input type="radio" name="inviteNumMode" value="timed" onclick="document.getElementById('inviteNumRightsOpts').style.display='none';document.getElementById('inviteNumTimeOpts').style.display='block'">
+                    ⏱️ Süreli
+                </label>
+            </div>
+
+            <div id="inviteNumRightsOpts" style="margin-bottom:15px; padding:10px; background:#f9f9f9; border-radius:5px;">
+                <small>Standart Hak (15-30)</small>
+            </div>
+            <div id="inviteNumTimeOpts" style="display:none; margin-bottom:15px;">
+                <select id="inviteNumDuration" style="width:100%; padding:10px;">
+                    <option value="3">3 Dakika</option>
+                    <option value="5">5 Dakika</option>
+                </select>
+            </div>
+
+            <button class="btn-green" onclick="sendInviteNumber()" style="width:100%; margin-top:15px; padding:12px;">DAVET GÖNDER</button>
+            <button class="btn-grey" onclick="closeModal('modal-invite-setup-number')" style="margin-top:5px; padding:10px;">GERİ</button>
+        </div>
+    </div>
+
+    <!-- INVITE SETUP WORD -->
+    <div id="modal-invite-setup-word" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🇹🇷 Kelime Oyunu Daveti</h3>
+            <p>Oyun ayarlarını belirle:</p>
+
+            <label style="display:block; text-align:left; margin-bottom:5px;">Kelime Uzunluğu:</label>
+            <select id="inviteWordLen" style="width:100%; padding:10px; margin-bottom:15px;">
+                <option value="4">4 Harfli</option>
+                <option value="5" selected>5 Harfli (Normal)</option>
+                <option value="6">6 Harfli</option>
+                <option value="7">7 Harfli</option>
+            </select>
+
+            <label style="display:block; text-align:left; margin-bottom:5px;">Oyun Modu:</label>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <label style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; cursor:pointer;">
+                    <input type="radio" name="inviteWordMode" value="rights" checked onclick="document.getElementById('inviteWordRightsOpts').style.display='block';document.getElementById('inviteWordTimeOpts').style.display='none'">
+                    ⚡ Haklı
+                </label>
+                <label style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; cursor:pointer;">
+                    <input type="radio" name="inviteWordMode" value="timed" onclick="document.getElementById('inviteWordRightsOpts').style.display='none';document.getElementById('inviteWordTimeOpts').style.display='block'">
+                    ⏱️ Süreli
+                </label>
+            </div>
+
+            <div id="inviteWordRightsOpts" style="margin-bottom:15px; padding:10px; background:#f9f9f9; border-radius:5px;">
+                <small>Standart: 6 Hak</small>
+            </div>
+            <div id="inviteWordTimeOpts" style="display:none; margin-bottom:15px;">
+                <select id="inviteWordDuration" style="width:100%; padding:10px;">
+                    <option value="3">3 Dakika</option>
+                    <option value="5">5 Dakika</option>
+                </select>
+            </div>
+
+            <button class="btn-green" onclick="sendInviteWord()" style="width:100%; margin-top:15px; padding:12px;">DAVET GÖNDER</button>
+            <button class="btn-grey" onclick="closeModal('modal-invite-setup-word')" style="margin-top:5px; padding:10px;">GERİ</button>
+        </div>
+    </div>
+
+    <!-- NEW ADMIN MESSENGER MODAL -->
+    <div id="modal-admin-messenger" class="modal-overlay">
+        <div class="modal-box" style="width:95%; max-width:700px; height:85vh; padding:0; display:flex; flex-direction:column; overflow:hidden; background:#fff;">
+
+            <!-- HEADER -->
+            <div style="padding:15px; background:#2d3436; color:#fff; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+                <h3 style="margin:0; font-size:1.1rem;">🕵️ Yönetim Mesaj Takip</h3>
+                <button onclick="closeModal('modal-admin-messenger')" style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+            </div>
+
+            <!-- TABS -->
+            <div style="display:flex; background:#dfe6e9; padding:5px; gap:5px; flex-shrink:0;">
+                <button id="am-tab-lobby" onclick="AdminMessenger.switchTab('lobby')" class="btn-sm" style="flex:1; background:#fff; color:#333; border:1px solid #ccc;">🏠 Lobi</button>
+                <button id="am-tab-private" onclick="AdminMessenger.switchTab('private')" class="btn-sm" style="flex:1; background:#fff; color:#333; border:1px solid #ccc;">🔐 DM</button>
+                <button id="am-tab-rooms" onclick="AdminMessenger.switchTab('rooms')" class="btn-sm" style="flex:1; background:#fff; color:#333; border:1px solid #ccc;">🎮 Odalar</button>
+            </div>
+
+            <!-- STATUS BAR -->
+            <div id="am-status" style="background:#fff3cd; color:#856404; font-size:0.75rem; padding:5px 10px; text-align:center; border-bottom:1px solid #eee; display:none;">
+                Durum: Bağlanıyor...
+            </div>
+
+            <!-- CONTENT LIST -->
+            <div id="am-list" class="list-container" style="flex:1; overflow-y:auto; padding:10px; background:#f9f9f9;">
+                <div style="text-align:center; padding:20px; color:#999;">Bir kategori seçin.</div>
+            </div>
+
+            <!-- FOOTER -->
+            <div style="padding:10px; background:#fff; border-top:1px solid #eee; text-align:center; font-size:0.7rem; color:#aaa;">
+                * Mesajlar anlık olarak güncellenir.
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // --- NEW PERFECT ADMIN MESSENGER ---
+    window.AdminMessenger = {
+        activeTab: null,
+        listener: null,
+        ref: null,
+
+        open: function() {
+            if (typeof db === 'undefined' || !db) {
+                // Global DB recovery attempt
+                try { db = firebase.database(); } catch(e) { alert("Veritabanı hatası!"); return; }
+            }
+            showModal('modal-admin-messenger');
+            this.switchTab('lobby');
+        },
+
+        switchTab: function(tab) {
+            this.activeTab = tab;
+
+            // Tab UI Logic
+            ['lobby', 'private', 'rooms'].forEach(t => {
+                const btn = document.getElementById('am-tab-' + t);
+                if (btn) {
+                    btn.style.background = (t === tab) ? '#6c5ce7' : '#fff';
+                    btn.style.color = (t === tab) ? '#fff' : '#333';
+                }
+            });
+
+            this.fetchData(tab);
+        },
+
+        fetchData: function(tab) {
+            const list = document.getElementById('am-list');
+            const status = document.getElementById('am-status');
+
+            // Reset
+            list.innerHTML = "";
+            status.style.display = 'block';
+            status.innerHTML = "⏳ Veriler getiriliyor...";
+
+            // Detach old
+            if (this.ref) this.ref.off();
+
+            // Set Ref
+            if (tab === 'lobby') {
+                this.ref = db.ref('lobby_chat').limitToLast(100);
+            } else if (tab === 'private') {
+                this.ref = db.ref('chats/private').limitToLast(50);
+            } else if (tab === 'rooms') {
+                this.ref = db.ref('rooms').limitToLast(50);
+            }
+
+            // Listen
+            let count = 0;
+            this.ref.on('child_added', snap => {
+                count++;
+                status.style.display = 'none'; // Hide status on first data
+
+                if (tab === 'lobby') this.renderLobbyItem(snap, list);
+                else if (tab === 'private') this.renderPrivateItem(snap, list);
+                else if (tab === 'rooms') this.renderRoomItem(snap, list);
+            });
+
+            // Empty state timeout
+            setTimeout(() => {
+                if (count === 0) {
+                    status.style.display = 'block';
+                    status.innerHTML = "📭 Veri bulunamadı.";
+                }
+            }, 3000);
+        },
+
+        renderLobbyItem: function(snap, list) {
+            const m = snap.val();
+            const time = new Date(m.t).toLocaleTimeString('tr-TR');
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.style.marginBottom = '5px';
+            item.innerHTML = `
+                <div style="width:100%;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888;">
+                        <span>👤 <b>${m.u}</b></span>
+                        <span>${time}</span>
+                    </div>
+                    <div style="margin-top:2px; font-size:0.9rem;">${this.safeHtml(m.m)}</div>
+                </div>
+                <button class="btn-red" style="width:auto; padding:2px 8px; margin-left:10px; font-size:0.7rem;" onclick="AdminMessenger.deleteMsg('lobby_chat/${snap.key}')">🗑️</button>
+            `;
+            list.prepend(item); // Newest top
+        },
+
+        renderPrivateItem: function(snap, list) {
+            const pair = snap.key.replace('_', ' ↔️ ');
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.style.background = '#fff3cd';
+            item.innerHTML = `
+                <div style="font-weight:bold; color:#d35400;">${pair}</div>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-blue" style="width:auto; padding:4px 8px; font-size:0.7rem;" onclick="AdminMessenger.viewDetail('private', '${snap.key}')">OKU</button>
+                    <button class="btn-red" style="width:auto; padding:4px 8px; font-size:0.7rem;" onclick="AdminMessenger.deleteMsg('chats/private/${snap.key}')">🗑️</button>
+                </div>
+            `;
+            list.prepend(item);
+        },
+
+        renderRoomItem: function(snap, list) {
+            const r = snap.val();
+            if (!r.chat) return; // Only show rooms with chat
+
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.style.background = '#e3f2fd';
+            item.innerHTML = `
+                <div style="font-size:0.85rem;">
+                    <b>Oda: ${snap.key}</b>
+                    <div style="font-size:0.7rem; color:#666;">💬 Sohbet aktif</div>
+                </div>
+                <button class="btn-purple" style="width:auto; padding:4px 8px; font-size:0.7rem;" onclick="AdminMessenger.viewDetail('rooms', '${snap.key}')">GÖR</button>
+            `;
+            list.prepend(item);
+        },
+
+        viewDetail: function(type, id) {
+            const list = document.getElementById('am-list');
+            list.innerHTML = `<button class="btn-grey" onclick="AdminMessenger.switchTab('${type}')" style="margin-bottom:10px;">⬅ Listeye Dön</button><div style="text-align:center;">Mesajlar yükleniyor...</div>`;
+
+            if (this.ref) this.ref.off();
+
+            let path = (type === 'private') ? `chats/private/${id}` : `rooms/${id}/chat`;
+            this.ref = db.ref(path).limitToLast(50);
+
+            const contentDiv = document.createElement('div');
+            list.appendChild(contentDiv);
+
+            this.ref.on('child_added', snap => {
+                // Remove loading text
+                if (list.innerHTML.includes('yükleniyor')) list.innerHTML = `<button class="btn-grey" onclick="AdminMessenger.switchTab('${type}')" style="margin-bottom:10px;">⬅ Listeye Dön</button>`;
+
+                const m = snap.val();
+                const msg = type === 'private' ? m.text : m.m;
+                const user = type === 'private' ? m.from : m.u;
+                const timeVal = type === 'private' ? m.timestamp : m.t;
+                const time = timeVal ? new Date(timeVal).toLocaleTimeString('tr-TR') : '-';
+
+                const div = document.createElement('div');
+                div.style.padding = "5px";
+                div.style.borderBottom = "1px solid #eee";
+                div.innerHTML = `<b>${user}:</b> ${this.safeHtml(msg)} <small style='color:#ccc; float:right;'>${time}</small>`;
+
+                // Add to list (append for chat history flow)
+                list.appendChild(div);
+            });
+        },
+
+        deleteMsg: function(path) {
+            if(confirm("Silmek istediğine emin misin?")) {
+                db.ref(path).remove().then(()=> alert("Silindi.")).catch(e=>alert(e.message));
+            }
+        },
+
+        safeHtml: function(text) {
+            if (!text) return "";
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    };
+
+    // --- GLOBAL AD CALLBACKS (CLEAN V2) ---
+    // Reklam kapandığında Kotlin tarafından tetiklenir
+    window.onAdClosed = function() {
+        console.log("Ad Closed - Resuming Game UI");
+
+        if (typeof AdManager !== "undefined") {
+            AdManager.hideAdLoading();
+            // Trigger Reward Callback if pending
+            if (AdManager.pendingCallback) {
+                AdManager.onReward();
+            }
+        }
+
+        if(window.resumeGame) window.resumeGame();
+    };
+
+    // Oyunun donmasını engelleyen kritik fonksiyon
+    window.resumeGame = function() {
+        console.log("Resume Game Signal Received");
+        if (typeof AdManager !== "undefined") AdManager.hideAdLoading();
+
+        // Burada eğer oyunu durdurduysan (pause), devam ettirme kodlarını ekleyebilirsin.
+        // Örn: game.paused = false;
+
+        // Beyaz ekran kalmaması için ekranı yenilemeye zorla (render fix)
+        window.dispatchEvent(new Event('resize'));
+    };
+    </script>
+
+    <!-- REMATCH CONFIG MODAL -->
+    <div id="modal-rematch-offer" class="modal-overlay">
+        <div class="modal-box">
+            <h3>🔄 Rövanş Ayarları</h3>
+            <p>Yeni oyun için kuralları belirle:</p>
+
+            <label style="display:block; text-align:left; margin-bottom:5px;">Zorluk:</label>
+            <select id="rematchConfigDiff" style="width:100%; padding:10px; margin-bottom:15px;">
+                <option value="4">4 Basamaklı</option>
+                <option value="5">5 Basamaklı</option>
+                <option value="6">6 Basamaklı</option>
+                <option value="7">7 Basamaklı</option>
+            </select>
+
+            <label style="display:block; text-align:left; margin-bottom:5px;">Oyun Modu:</label>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <label style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; cursor:pointer;">
+                    <input type="radio" name="rematchConfigMode" value="rights" checked onclick="document.getElementById('rematchRightsOpts').style.display='block';document.getElementById('rematchTimeOpts').style.display='none'">
+                    ⚡ Haklı
+                </label>
+                <label style="flex:1; padding:10px; border:1px solid #ddd; border-radius:10px; cursor:pointer;">
+                    <input type="radio" name="rematchConfigMode" value="timed" onclick="document.getElementById('rematchRightsOpts').style.display='none';document.getElementById('rematchTimeOpts').style.display='block'">
+                    ⏱️ Süreli
+                </label>
+            </div>
+
+            <div id="rematchRightsOpts" style="margin-bottom:15px; padding:10px; background:#f9f9f9; border-radius:5px;">
+                <small>Standart Hak (Zorluğa göre)</small>
+            </div>
+            <div id="rematchTimeOpts" style="display:none; margin-bottom:15px;">
+                <select id="rematchConfigDuration" style="width:100%; padding:10px;">
+                    <option value="3">3 Dakika</option>
+                    <option value="5">5 Dakika</option>
+                </select>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <button class="btn-green" onclick="sendRematchOffer()" style="flex:1; padding:12px;">TEKLİF GÖNDER</button>
+                <button class="btn-grey" onclick="closeModal('modal-rematch-offer')" style="flex:1; padding:12px;">İPTAL</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
